@@ -1,7 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/asm-3.2.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/asm-commons-3.2.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/browser.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/checkconfigurationfile.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/checkser.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/classdep.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/classserver.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/computedigest.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/computehttpmdcodebase.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/destroy.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/envcheck.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/extra.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/fiddler.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/group.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jarwrapper.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jini-core.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jini-ext.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jsk-debug-policy.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jsk-lib.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jsk-platform.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/jsk-resources.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/mahalo.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/mercury.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/norm.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/outrigger-snaplogstore.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/outrigger.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/phoenix-group.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/phoenix-init.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/phoenix.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/preferredlistgen.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/reggie.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/serviceui.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/sharedvm.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/start.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/sun-util.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib/tools.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/browser-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/fiddler-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/group-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/jsk-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/mahalo-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/mercury-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/norm-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/outrigger-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/phoenix-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/reggie-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-dl/sdm-dl.jar"/>
+	<classpathentry kind="lib" path="/Users/well/apache-river/lib-ext/jsk-policy.jar"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
