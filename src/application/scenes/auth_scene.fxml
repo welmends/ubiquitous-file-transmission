@@ -25,20 +25,61 @@
       </HBox>
       <HBox alignment="CENTER">
          <children>
-            <TextField fx:id="usernameTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Username" style="-fx-background-radius: 5em;">
+            <TextField fx:id="deviceTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Device name" style="-fx-background-radius: 5em;">
                <font>
                   <Font size="11.0" />
                </font>
                <HBox.margin>
                   <Insets right="5.0" />
                </HBox.margin></TextField>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="30.0" layoutY="67.0">
+         <children>
+            <TextField fx:id="ipTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Ip Address" style="-fx-background-radius: 5em;">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="30.0" layoutY="67.0">
+         <children>
+            <TextField fx:id="portTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Port number" style="-fx-background-radius: 5em;">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="30.0" layoutY="137.0">
+         <children>
+            <TextField fx:id="axisTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="x-axis,y-axis" style="-fx-background-radius: 5em;">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="30.0" layoutY="67.0">
+         <children>
             <Button fx:id="enterButton" maxHeight="25.0" maxWidth="25.0" minHeight="25.0" minWidth="25.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0" style="-fx-background-radius: 5em;" textFill="#444444">
                <font>
                   <Font name="Arial" size="13.0" />
                </font>
                <HBox.margin>
                   <Insets left="5.0" />
-               </HBox.margin></Button>
+               </HBox.margin>
+            </Button>
          </children>
       </HBox>
    </children>

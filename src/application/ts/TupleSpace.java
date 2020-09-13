@@ -15,6 +15,10 @@ public class TupleSpace extends Thread {
     private Boolean is_connected;
     private String device_name;
     private String environment_name;
+    private String ip_address;
+    private Integer port_number;
+    private Integer x_axis;
+    private Integer y_axis;
     private Semaphore mutex;
     
     // Constructor
@@ -22,6 +26,10 @@ public class TupleSpace extends Thread {
 		this.is_connected = false;
 		this.device_name = "";
 		this.environment_name = "";
+		this.ip_address = "";
+		this.port_number = -1;
+		this.x_axis = -1;
+		this.y_axis = -1;
 		this.mutex = new Semaphore(1);
 	}
 	
@@ -61,8 +69,13 @@ public class TupleSpace extends Thread {
 	}
 	
 	// Connection
-    public Boolean connect(String device_name){
+    public Boolean connect(String device_name, String ip_address, Integer port_number, Integer x_axis, Integer y_axis){
+    	// Define environment at initial procedure
     	this.device_name = device_name;
+    	this.ip_address = ip_address;
+    	this.port_number = port_number;
+    	this.x_axis = x_axis;
+    	this.y_axis = y_axis;
     	this.lookup = new Lookup(JavaSpace.class);
 		this.space = (JavaSpace) this.lookup.getService();
 		this.space_admin = (JavaSpace) this.lookup.getService();
