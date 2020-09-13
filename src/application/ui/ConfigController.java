@@ -20,7 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -28,7 +27,6 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	// FXML Variables
 	@FXML HBox mainHBox;
-	@FXML ImageView chatImageView;
 	@FXML Label chatLabel;
 	@FXML Button add_btn;
 	@FXML TextField add_tf;
@@ -39,14 +37,12 @@ public class ConfigController extends Thread implements Initializable  {
 	private TupleSpace ts;
 	
 	// Controllers
-	private ChatController chat;
 	
 	// Variables
 	private ConfigComponentsArrayUtils componentsArray_utils;
 	
-	public void loadFromParent(TupleSpace ts, ChatController chat) {
+	public void loadFromParent(TupleSpace ts) {
 		this.ts = ts;
-		this.chat = chat;
 	}
 	
 	@Override
@@ -93,8 +89,6 @@ public class ConfigController extends Thread implements Initializable  {
 		chatLabel.setText(ConfigConstants.CHAT_LABEL_TEXT);
 		chatLabel.setStyle(ConfigConstants.CHAT_LABEL_STYLE);
 		
-		chatImageView.setImage(ImageConstants.CHAT_TOP_ICON);
-		
 		add_tf.setStyle(ConfigConstants.ADD_TEXT_FIELD_STYLE);
 		
 		add_btn.setStyle(ConfigConstants.ADD_BUTTON_STYLE);
@@ -111,12 +105,6 @@ public class ConfigController extends Thread implements Initializable  {
 			
 			ts.set_chat_type(TupleSpaceConstants.ROOM_CHAT);
 			ts.set_room_name(tp_room.getText());
-			
-			chat.userImageView.setImage(ImageConstants.MULTI_USER_ICON);
-			chat.chatLabelContact.setText(ts.get_room_name());
-			chat.clearChat();
-			chat.loadChat();
-			chat.disableChatTextField(false);
         });
 		
 		b_leave_room.setOnAction((event)->{
@@ -129,11 +117,6 @@ public class ConfigController extends Thread implements Initializable  {
 				ts.set_chat_type(null);
 				ts.set_room_name("");
 				ts.set_contact_name("");
-				
-				chat.userImageView.setImage(null);
-				chat.chatLabelContact.setText(null);
-				chat.clearChat();
-				chat.disableChatTextField(true);
 			}
         });
     }
@@ -142,12 +125,6 @@ public class ConfigController extends Thread implements Initializable  {
 		b_contact.setOnAction((event)->{
 			ts.set_contact_name(b_contact.getText());
 			ts.set_chat_type(TupleSpaceConstants.CONTACT_CHAT);
-			
-			chat.userImageView.setImage(ImageConstants.MONO_USER_ICON);
-			chat.chatLabelContact.setText(ts.get_contact_name());
-			chat.clearChat();
-			chat.loadChat();
-			chat.disableChatTextField(false);
         });
 	}
 	

@@ -29,13 +29,11 @@ public class AuthController implements Initializable {
     private HashMap<String, String> credentials = new HashMap<String, String>();
     
     private MainController main;
-    private ChatController chat;
     private ConfigController config;
     
-    public AuthController(TupleSpace ts, MainController main, ChatController chat, ConfigController config) {
+    public AuthController(TupleSpace ts, MainController main, ConfigController config) {
     	this.ts = ts;
     	this.main = main;
-    	this.chat = chat;
     	this.config = config;
     }
     
@@ -51,7 +49,6 @@ public class AuthController implements Initializable {
     
     private void closeStage() {
     	ts.start();
-    	chat.start();
     	config.start();
         if(stage!=null) {
             stage.close();
@@ -85,7 +82,7 @@ public class AuthController implements Initializable {
             		disableComponents(false);
             		return;
         		}else {
-        			chat.chatLabelUser.setText(ts.get_user_name());
+        			//chat.chatLabelUser.setText(ts.get_user_name());
         		}
         	}
         	

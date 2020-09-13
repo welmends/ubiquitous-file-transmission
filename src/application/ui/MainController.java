@@ -29,14 +29,12 @@ public class MainController implements Initializable {
 	@FXML HBox mainHBox;
 	
 	// FXML Loaders
-	private FXMLLoader chatLoader;
 	private FXMLLoader configLoader;
 	
 	// COM Variables
 	private TupleSpace ts;
 	
 	// Controllers
-	private ChatController chatController;
 	private ConfigController configController;
 	
 	// Main Object
@@ -50,15 +48,12 @@ public class MainController implements Initializable {
 		// Initialize Objects
 		ts = new TupleSpace();
 		
-		Scene chatScene = null;
 		Scene configScene = null;
 		
-		chatLoader = new FXMLLoader(getClass().getResource(FXMLConstants.FXML_CHAT_CONTROLLER));
 		configLoader = new FXMLLoader(getClass().getResource(FXMLConstants.FXML_CONFIG_CONTROLLER));
 		
 		//Load Scenes
 		try {
-			chatScene = new Scene(chatLoader.load());
 			configScene = new Scene(configLoader.load());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -66,18 +61,15 @@ public class MainController implements Initializable {
 		
 		// Add nodes to MainController holders 
 		mainHBox.getChildren().add(configScene.getRoot());
-		mainHBox.getChildren().add(chatScene.getRoot());
 		
 		// Get Controller
-		chatController = chatLoader.getController();
 		configController = configLoader.getController();
 		
 		// Authentication
 		authentication();
 		
 		// Load common objects from parent
-		chatController.loadFromParent(ts);
-		configController.loadFromParent(ts, chatController);
+		configController.loadFromParent(ts);
 	}
 	
 	public void closeApplication() {
@@ -89,7 +81,7 @@ public class MainController implements Initializable {
         Scene scene;
         Stage auth_stage;
         FXMLLoader loader = new FXMLLoader();
-        AuthController popupController = new AuthController(ts, this, chatController, configController);
+        AuthController popupController = new AuthController(ts, this, configController);
         
         loader.setLocation(getClass().getResource(FXMLConstants.FXML_AUTH_CONTROLLER));
         loader.setController(popupController);
@@ -100,7 +92,7 @@ public class MainController implements Initializable {
             auth_stage = new Stage();
             popupController.setStage(auth_stage);
             if(this.main!=null) { auth_stage.initOwner(this.main.getPrimaryStage()); }
-            auth_stage.getIcons().add(ImageConstants.CHAT_TOP_ICON);
+            auth_stage.getIcons().add(ImageConstants.FILE_TRANSMISSION_ICON);
             auth_stage.setTitle(MainConstants.TITLE_TEXT);
             auth_stage.initModality(Modality.WINDOW_MODAL);
             auth_stage.setResizable(false);

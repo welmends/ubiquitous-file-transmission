@@ -32,7 +32,7 @@ public class Main extends Application {
 		loader.setController(mainController);
 		root = loader.load();
 		
-        this.primaryStage.getIcons().add(ImageConstants.CHAT_TOP_ICON);
+        this.primaryStage.getIcons().add(ImageConstants.FILE_TRANSMISSION_ICON);
         this.primaryStage.setTitle(MainConstants.TITLE_TEXT);
 		this.primaryStage.setResizable(false);
 		this.primaryStage.setScene(new Scene(root, MainConstants.SCENE_WIDTH, MainConstants.SCENE_HEIGHT));
