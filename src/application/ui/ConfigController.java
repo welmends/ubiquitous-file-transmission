@@ -70,7 +70,7 @@ public class ConfigController extends Thread implements Initializable  {
 			
 			List<String> ts_envs = ts.get_environments_list();
 			List<String> ts_devices = ts.get_devices_list();
-			HashMap<String, String> ts_hash = ts.get_hash_rooms_contacts();
+			HashMap<String, String> ts_hash = ts.get_hash_environments_devices();
 			
 			Platform.runLater(new Runnable() {
 				@Override

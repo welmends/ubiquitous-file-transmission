@@ -141,7 +141,7 @@ public class TupleSpace extends Thread {
         return true;
     }
     
-    public HashMap<String, String> get_hash_rooms_contacts() {
+    public HashMap<String, String> get_hash_environments_devices() {
     	HashMap<String, String> hash = new HashMap<String, String>();
     	List<String> envs = get_environments_list();
     	List<String> devices;
