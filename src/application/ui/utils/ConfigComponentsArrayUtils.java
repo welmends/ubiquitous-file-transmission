@@ -18,29 +18,29 @@ public class ConfigComponentsArrayUtils {
 	private ConfigController config;
 	private VBox vboxOnScroll;
 	private HashMap<String, String> hash;
-	private List<TitledPane> rooms_components;
-	private List<Button> contacts_components;
-	private TitledPane room_all;
+	private List<TitledPane> envs_components;
+	private List<Button> devices_components;
+	private TitledPane env_all;
 	private List<Button> contacts_components_on_all;
 	
 	public ConfigComponentsArrayUtils(ConfigController config, VBox vboxOnScroll){
 		this.config = config;
 		this.vboxOnScroll = vboxOnScroll;
 		this.hash = new HashMap<String, String>();
-		this.rooms_components = new ArrayList<TitledPane>();
-		this.contacts_components = new ArrayList<Button>();
-		this.room_all = null;
+		this.envs_components = new ArrayList<TitledPane>();
+		this.devices_components = new ArrayList<Button>();
+		this.env_all = null;
 		this.contacts_components_on_all = new ArrayList<Button>();
 	}
 	
-	public void init_all_room(String ts_user_name) {
+	public void init_all_env(String ts_user_name) {
 		TitledPane tp = new TitledPane();
 		tp.setText(TupleSpaceConstants.ALL_ROOM_TEXT);
 		tp.setStyle(ConfigConstants.TITLED_PANE_STYLE);
 		tp.setContentDisplay(ConfigConstants.ROOM_BUTTON_CONTENT_DISPLAY);
 		tp.setContent(new VBox());
 		
-		room_all = tp;
+		env_all = tp;
 		
         vboxOnScroll.getChildren().add(tp);
         
@@ -48,27 +48,27 @@ public class ConfigComponentsArrayUtils {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void updateComponentsList(String user_name, List<String> ts_rooms, List<String> ts_contacts, HashMap<String, String> ts_hash) {
+	public void updateComponentsList(String user_name, List<String> ts_envs, List<String> ts_devices, HashMap<String, String> ts_hash) {
 		Boolean add_del;
 		
 		// All Room
-		for (int i=0; i<ts_contacts.size(); i++) {
+		for (int i=0; i<ts_devices.size(); i++) {
 			add_del = true;
 			for (int j=0; j<contacts_components_on_all.size(); j++) {
-				if(ts_contacts.get(i).equals(contacts_components_on_all.get(j).getText())) {
+				if(ts_devices.get(i).equals(contacts_components_on_all.get(j).getText())) {
 					add_del = false;
 					break;
 				}
 			}
 			if(add_del) {
-				add_contact_button_on_all(user_name, ts_contacts.get(i));
+				add_contact_button_on_all(user_name, ts_devices.get(i));
 			}
 		}
 		
 		for (int i=0; i<contacts_components_on_all.size(); i++) {
 			add_del = true;
-			for (int j=0; j<ts_contacts.size(); j++) {
-				if(contacts_components_on_all.get(i).getText().equals(ts_contacts.get(j))) {
+			for (int j=0; j<ts_devices.size(); j++) {
+				if(contacts_components_on_all.get(i).getText().equals(ts_devices.get(j))) {
 					add_del = false;
 					break;
 				}
@@ -79,32 +79,32 @@ public class ConfigComponentsArrayUtils {
 		}
 		
 		// Common Rooms
-		for (int i=0; i<ts_rooms.size(); i++) {
-			if(ts_rooms.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
+		for (int i=0; i<ts_envs.size(); i++) {
+			if(ts_envs.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
 				continue;
 			}
 			add_del = true;
-			for (int j=0; j<rooms_components.size(); j++) {
-				if(ts_rooms.get(i).equals(rooms_components.get(j).getText())) {
+			for (int j=0; j<envs_components.size(); j++) {
+				if(ts_envs.get(i).equals(envs_components.get(j).getText())) {
 					add_del = false;
 					break;
 				}
 			}
 			if(add_del) {
-				add_room_titledPane(ts_rooms.get(i));
+				add_room_titledPane(ts_envs.get(i));
 			}
 		}
 		
-		for (int i=0; i<rooms_components.size(); i++) {
+		for (int i=0; i<envs_components.size(); i++) {
 			add_del = true;
-			for (int j=0; j<ts_rooms.size(); j++) {
-				if(rooms_components.get(i).getText().equals(ts_rooms.get(j))) {
+			for (int j=0; j<ts_envs.size(); j++) {
+				if(envs_components.get(i).getText().equals(ts_envs.get(j))) {
 					add_del = false;
 					break;
 				}
 			}
 			if(add_del) {
-				del_room_titledpane(rooms_components.get(i).getText());
+				del_room_titledpane(envs_components.get(i).getText());
 			}
 		}
 		
@@ -159,9 +159,9 @@ public class ConfigComponentsArrayUtils {
 			tp.getWidth() - h.getLayoutX() - h.getWidth() - ConfigConstants.ROOM_BUTTON_GRAPHIC_MARGIN_RIGHT, tp.widthProperty())
 		);
 		
-		config.setRoomBtnPressedBehavior(tp, b_enter, b_leave);
+		config.setEnvBtnPressedBehavior(tp, b_enter, b_leave);
 		
-		rooms_components.add(tp);
+		envs_components.add(tp);
 		
         vboxOnScroll.getChildren().add(tp);
 	}
@@ -171,16 +171,16 @@ public class ConfigComponentsArrayUtils {
 		b.setText(contact_name);
 		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
-		config.setContactBtnPressedBehavior(b);
+		config.setDeviceBtnPressedBehavior(b);
 		if(contact_name.equals(ts_user_name)) {
 			b.setDisable(true);
 		}
 		
-		contacts_components.add(b);
+		devices_components.add(b);
 		
-		for (int i=0; i<rooms_components.size(); i++) {
-			if(rooms_components.get(i).getText().equals(room_name)) {
-				VBox content = (VBox) rooms_components.get(i).getContent();
+		for (int i=0; i<envs_components.size(); i++) {
+			if(envs_components.get(i).getText().equals(room_name)) {
+				VBox content = (VBox) envs_components.get(i).getContent();
 				content.getChildren().add(b);
 			}
 		}
@@ -193,35 +193,35 @@ public class ConfigComponentsArrayUtils {
 		b.setText(contact_name);
 		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
-		config.setContactBtnPressedBehavior(b);
+		config.setDeviceBtnPressedBehavior(b);
 		if(contact_name.equals(ts_user_name)) {
 			b.setDisable(true);
 		}
 		
 		contacts_components_on_all.add(b);
 		
-		VBox content = (VBox) room_all.getContent();
+		VBox content = (VBox) env_all.getContent();
 		content.getChildren().add(b);
 	}
 	
 	private void del_room_titledpane(String room_name) {
-		for (int i=0; i<rooms_components.size(); i++) {
-			if(rooms_components.get(i).getText().equals(room_name)) {
-				vboxOnScroll.getChildren().remove(rooms_components.get(i));
-				rooms_components.remove(i);
+		for (int i=0; i<envs_components.size(); i++) {
+			if(envs_components.get(i).getText().equals(room_name)) {
+				vboxOnScroll.getChildren().remove(envs_components.get(i));
+				envs_components.remove(i);
 				break;
 			}
 		}
 	}
 	
 	private void del_contact_button(String room_name, String contact_name) {
-		for (int i=0; i<rooms_components.size(); i++) {
-			if(rooms_components.get(i).getText().equals(room_name)) {
-				for (int j=0; j<contacts_components.size(); j++) {
-					if(contacts_components.get(j).getText().equals(contact_name)) {
-						VBox content = (VBox) rooms_components.get(i).getContent();
-						content.getChildren().remove(contacts_components.get(j));
-						contacts_components.remove(j);
+		for (int i=0; i<envs_components.size(); i++) {
+			if(envs_components.get(i).getText().equals(room_name)) {
+				for (int j=0; j<devices_components.size(); j++) {
+					if(devices_components.get(j).getText().equals(contact_name)) {
+						VBox content = (VBox) envs_components.get(i).getContent();
+						content.getChildren().remove(devices_components.get(j));
+						devices_components.remove(j);
 		        		break;
 					}
 				}
@@ -235,7 +235,7 @@ public class ConfigComponentsArrayUtils {
 	private void del_contact_button_on_all(String contact_name) {
 		for (int i=0; i<contacts_components_on_all.size(); i++) {
 			if(contacts_components_on_all.get(i).getText().equals(contact_name)) {
-				VBox content = (VBox) room_all.getContent();
+				VBox content = (VBox) env_all.getContent();
 				content.getChildren().remove(contacts_components_on_all.get(i));
 				contacts_components_on_all.remove(i);
         		break;

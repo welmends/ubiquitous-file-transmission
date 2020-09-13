@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.ts.TupleSpace;
-import application.ts.TupleSpaceConstants;
 import application.ui.constants.ConfigConstants;
 import application.ui.constants.ImageConstants;
 import application.ui.utils.ConfigComponentsArrayUtils;
@@ -58,7 +57,7 @@ public class ConfigController extends Thread implements Initializable  {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				componentsArray_utils.init_all_room(ts.get_user_name());
+				componentsArray_utils.init_all_env(ts.get_device_name());
 			}
 		});
 		
@@ -69,14 +68,14 @@ public class ConfigController extends Thread implements Initializable  {
 				System.out.println("Error: ConfigController (thread)");
 			}
 			
-			List<String> ts_rooms = ts.get_rooms_list();
-			List<String> ts_contacts = ts.get_contacts_list();
+			List<String> ts_envs = ts.get_environments_list();
+			List<String> ts_devices = ts.get_devices_list();
 			HashMap<String, String> ts_hash = ts.get_hash_rooms_contacts();
 			
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					componentsArray_utils.updateComponentsList(ts.get_user_name(), ts_rooms, ts_contacts, ts_hash);
+					componentsArray_utils.updateComponentsList(ts.get_device_name(), ts_envs, ts_devices, ts_hash);
 				}
 			});
 			
@@ -90,36 +89,32 @@ public class ConfigController extends Thread implements Initializable  {
 		uftImageView.setImage(ImageConstants.FILE_TRANSMISSION_ICON);
 	}
 	
-	public void setRoomBtnPressedBehavior(TitledPane tp_room, Button b_enter_room, Button b_leave_room) {
-		b_enter_room.setOnAction((event)->{
+	public void setEnvBtnPressedBehavior(TitledPane tp_env, Button b_enter_env, Button b_leave_env) {
+		b_enter_env.setOnAction((event)->{
 			do {
-				if(ts.select_room(tp_room.getText())) {
+				if(ts.select_environment(tp_env.getText())) {
 					break;
 				}
 			}while(true);
 			
-			ts.set_chat_type(TupleSpaceConstants.ROOM_CHAT);
-			ts.set_room_name(tp_room.getText());
+			ts.set_environment_name(tp_env.getText());
         });
 		
-		b_leave_room.setOnAction((event)->{
-			if(ts.get_room_name().equals(tp_room.getText())) {
+		b_leave_env.setOnAction((event)->{
+			if(ts.get_environment_name().equals(tp_env.getText())) {
 				do {
-					if(ts.deselect_room()) {
+					if(ts.deselect_environment()) {
 						break;
 					}
 				}while(true);
-				ts.set_chat_type(null);
-				ts.set_room_name("");
-				ts.set_contact_name("");
+				ts.set_environment_name("");
 			}
         });
     }
 	
-	public void setContactBtnPressedBehavior(Button b_contact) {
-		b_contact.setOnAction((event)->{
-			ts.set_contact_name(b_contact.getText());
-			ts.set_chat_type(TupleSpaceConstants.CONTACT_CHAT);
+	public void setDeviceBtnPressedBehavior(Button b_device) {
+		b_device.setOnAction((event)->{
+			//...
         });
 	}
 	

@@ -13,50 +13,45 @@ public class TupleSpace extends Thread {
 	private JavaSpace space_admin;
 	
     private Boolean is_connected;
-    private Boolean chat_type;
-    private String user_name;
-    private String contact_name;
-    private String room_name;
-    
+    private String device_name;
+    private String environment_name;
     private Semaphore mutex;
     
     // Constructor
 	public TupleSpace() {
 		this.is_connected = false;
-		this.chat_type = null;
-		this.user_name = "";
-		this.contact_name = "";
-		this.room_name = "";
+		this.device_name = "";
+		this.environment_name = "";
 		this.mutex = new Semaphore(1);
 	}
 	
 	// Thread
 	@Override
 	public void run() {
-		List<String> to_remove_rooms = new ArrayList<String>();
+		List<String> to_remove_envs = new ArrayList<String>();
 		while(true) {
 			try {
 				// Sleep
 				Thread.sleep(TupleSpaceConstants.THREAD_SLEEP_TIME_MILLIS);
 				// Update tuple_admin
-				to_remove_rooms.clear();
+				to_remove_envs.clear();
 	        	TupleAdmin template_admin = new TupleAdmin();
 	        	TupleAdmin tuple_admin = (TupleAdmin) this.space_admin.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
 	        	if(tuple_admin!=null) {
-	        		TupleRoom template_room = new TupleRoom();
-	        		for (int i=0; i<tuple_admin.rooms.size(); i++) {
-	        			if(tuple_admin.rooms.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
+	        		TupleEnvironment template_env = new TupleEnvironment();
+	        		for (int i=0; i<tuple_admin.environments.size(); i++) {
+	        			if(tuple_admin.environments.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
 	        				continue;
 	        			}
-						template_room.room_name = tuple_admin.rooms.get(i);
-						TupleRoom tuple_room = (TupleRoom) this.space_admin.read(template_room, null, TupleSpaceConstants.TIMER_NO_WAIT);
-						if(tuple_room==null) {
-							to_remove_rooms.add(tuple_admin.rooms.get(i));
+	        			template_env.environment_name = tuple_admin.environments.get(i);
+						TupleEnvironment tuple_env = (TupleEnvironment) this.space_admin.read(template_env, null, TupleSpaceConstants.TIMER_NO_WAIT);
+						if(tuple_env==null) {
+							to_remove_envs.add(tuple_admin.environments.get(i));
 						}
 					}
 	        	}
-        		for (int i=0; i<to_remove_rooms.size(); i++) {
-					tuple_admin.rooms.remove(to_remove_rooms.get(i));
+        		for (int i=0; i<to_remove_envs.size(); i++) {
+					tuple_admin.environments.remove(to_remove_envs.get(i));
 				}
 	        	this.space_admin.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
 			} catch (Exception e) {
@@ -66,8 +61,8 @@ public class TupleSpace extends Thread {
 	}
 	
 	// Connection
-    public Boolean connect(String user_name){
-    	this.user_name = user_name;
+    public Boolean connect(String device_name){
+    	this.device_name = device_name;
     	this.lookup = new Lookup(JavaSpace.class);
 		this.space = (JavaSpace) this.lookup.getService();
 		this.space_admin = (JavaSpace) this.lookup.getService();
@@ -86,14 +81,14 @@ public class TupleSpace extends Thread {
         	TupleAdmin template_admin = new TupleAdmin();
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin!=null) {
-        		if(tuple_admin.contacts.contains(user_name)) {
-        			tuple_admin.contacts.remove(user_name);
+        		if(tuple_admin.devices.contains(get_device_name())) {
+        			tuple_admin.devices.remove(get_device_name());
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
         	}
-    		//Update tuple_room
+    		//Update tuple_environment
 			do {
-				if(deselect_room()) {
+				if(deselect_environment()) {
 					break;
 				}
 			}while(true);
@@ -109,20 +104,20 @@ public class TupleSpace extends Thread {
         	TupleAdmin template_admin = new TupleAdmin();
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin==null) {
-        		template_admin.rooms = new ArrayList<String>();
-        		template_admin.rooms.add(TupleSpaceConstants.ALL_ROOM_TEXT);
-        		template_admin.contacts = new ArrayList<String>();
-        		template_admin.contacts.add(user_name);
+        		template_admin.environments = new ArrayList<String>();
+        		template_admin.environments.add(TupleSpaceConstants.ALL_ROOM_TEXT);
+        		template_admin.devices = new ArrayList<String>();
+        		template_admin.devices.add(get_device_name());
         		this.space.write(template_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-    			TupleRoom tuple_room = new TupleRoom();
-    			tuple_room.room_name = TupleSpaceConstants.ALL_ROOM_TEXT;
-    			tuple_room.contacts = new ArrayList<String>();
-    			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+    			TupleEnvironment tuple_env = new TupleEnvironment();
+    			tuple_env.environment_name = TupleSpaceConstants.ALL_ROOM_TEXT;
+    			tuple_env.devices = new ArrayList<String>();
+    			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         	}else {
-        		if(tuple_admin.contacts.contains(user_name)) {
+        		if(tuple_admin.devices.contains(get_device_name())) {
         			return false;
         		}else {
-        			tuple_admin.contacts.add(user_name);
+        			tuple_admin.devices.add(get_device_name());
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
@@ -135,268 +130,176 @@ public class TupleSpace extends Thread {
     
     public HashMap<String, String> get_hash_rooms_contacts() {
     	HashMap<String, String> hash = new HashMap<String, String>();
-    	List<String> rooms = get_rooms_list();
-    	List<String> contacts;
-    	for (int i=0; i<rooms.size(); i++) {
-    		if(rooms.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
+    	List<String> envs = get_environments_list();
+    	List<String> devices;
+    	for (int i=0; i<envs.size(); i++) {
+    		if(envs.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
     			continue;
     		}
-			contacts = get_contacts_list(rooms.get(i));
-	    	for (int j=0; j<contacts.size(); j++) {
-	    		hash.put(contacts.get(j), rooms.get(i));
+    		devices = get_devices_list(envs.get(i));
+	    	for (int j=0; j<devices.size(); j++) {
+	    		hash.put(devices.get(j), envs.get(i));
 			}
 		}
     	return hash;
     }
     
-    public List<String> get_rooms_list() {
-    	List<String> rooms = new ArrayList<String>();
+    public List<String> get_environments_list() {
+    	List<String> envs = new ArrayList<String>();
         try {
         	TupleAdmin template_admin = new TupleAdmin();
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin!=null) {
-        		rooms = tuple_admin.rooms;
+        		envs = tuple_admin.environments;
         	}
 		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (get_rooms_list)");
+			System.out.println("Error: TupleSpace (get_environments_list)");
 		}
-        return rooms;
+        return envs;
     }
     
-    public List<String> get_contacts_list() {
-    	List<String> contacts = new ArrayList<String>();
+    public List<String> get_devices_list() {
+    	List<String> devices = new ArrayList<String>();
         try {
         	TupleAdmin template_admin = new TupleAdmin();
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin!=null) {
-        		contacts = tuple_admin.contacts;
+        		devices = tuple_admin.devices;
         	}
 		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (get_contacts_list)");
+			System.out.println("Error: TupleSpace (get_devices_list)");
 		}
-        return contacts;
+        return devices;
     }
     
-    public List<String> get_contacts_list(String room_name) {
-    	List<String> contacts = new ArrayList<String>();
+    public List<String> get_devices_list(String environment_name) {
+    	List<String> devices = new ArrayList<String>();
         try {
-        	TupleRoom template_room = new TupleRoom();
-        	template_room.room_name = room_name;
-        	TupleRoom tuple_room = (TupleRoom) this.space.read(template_room, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-        	if(tuple_room!=null) {
-        		contacts = tuple_room.contacts;
+        	TupleEnvironment template_env = new TupleEnvironment();
+        	template_env.environment_name = environment_name;
+        	TupleEnvironment tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        	if(tuple_env!=null) {
+        		devices = tuple_env.devices;
         	}
 		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (get_contacts_list)");
+			System.out.println("Error: TupleSpace (get_devices_list)");
 		}
-        return contacts;
+        return devices;
     }
     
-    public Boolean add_room(String room_name) {
+    public Boolean add_environment(String environment_name) {
         try {
         	TupleAdmin template_admin = new TupleAdmin();
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin!=null) {
-        		if(!tuple_admin.rooms.contains(room_name)) {
+        		if(!tuple_admin.environments.contains(environment_name)) {
         			//Update tuple_admin
-        			tuple_admin.rooms.add(room_name);
+        			tuple_admin.environments.add(environment_name);
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         			//Create tuple_room
-        			TupleRoom tuple_room = new TupleRoom();
-        			tuple_room.room_name = room_name;
-        			tuple_room.contacts = new ArrayList<String>();
-        			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+        			TupleEnvironment tuple_env = new TupleEnvironment();
+        			tuple_env.environment_name = environment_name;
+        			tuple_env.devices = new ArrayList<String>();
+        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
         		}
         	}
 		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (add_room)");
+			System.out.println("Error: TupleSpace (add_environment)");
 			return false;
 		}
         return true;
     }
     
-    public Boolean select_room(String room_name) {
+    public Boolean select_environment(String environment_name) {
     	try {
-        	TupleRoom template_room = new TupleRoom();
-        	TupleRoom tuple_room = new TupleRoom();
-        	if(!this.room_name.equals("")) {
-        		template_room.room_name = get_room_name();
-        		tuple_room = (TupleRoom) this.space.take(template_room, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-        		if(tuple_room!=null) {
-        			tuple_room.contacts.remove(this.user_name);
-            		if(tuple_room.contacts.size()==0) {
-            			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+        	TupleEnvironment template_env = new TupleEnvironment();
+        	TupleEnvironment tuple_env = new TupleEnvironment();
+        	if(!get_environment_name().equals("")) {
+        		template_env.environment_name = get_environment_name();
+        		tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        		if(tuple_env!=null) {
+        			tuple_env.devices.remove(get_device_name());
+            		if(tuple_env.devices.size()==0) {
+            			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
             		}else {
-            			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+            			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
             		}
         		}
         	}
-        	template_room.room_name = room_name;
-    		tuple_room = (TupleRoom) this.space.take(template_room, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-    		if(tuple_room!=null) {
-    			tuple_room.contacts.add(this.user_name);
-        		if(tuple_room.contacts.size()==0) {
-        			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+        	template_env.environment_name = get_environment_name();
+        	tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+    		if(tuple_env!=null) {
+    			tuple_env.devices.add(get_device_name());
+        		if(tuple_env.devices.size()==0) {
+        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
         		}else {
-        			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
     		}
 		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (select_room)");
+			System.out.println("Error: TupleSpace (select_environment)");
 			return false;
 		}
     	return true;
     }
     
-    public Boolean deselect_room() {
+    public Boolean deselect_environment() {
         try {
-        	// Common Room
-        	TupleRoom template_room = new TupleRoom();
-        	template_room.room_name = get_room_name();
-        	TupleRoom tuple_room = (TupleRoom) this.space.take(template_room, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-        	if(tuple_room!=null) {
-        		if(tuple_room.contacts.contains(get_user_name())) {
-        			tuple_room.contacts.remove(get_user_name());
-            		if(tuple_room.contacts.size()==0) {
-            			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+        	// Common Environment
+        	TupleEnvironment template_env = new TupleEnvironment();
+        	template_env.environment_name = get_environment_name();
+        	TupleEnvironment tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        	if(tuple_env!=null) {
+        		if(tuple_env.devices.contains(get_device_name())) {
+        			tuple_env.devices.remove(get_device_name());
+            		if(tuple_env.devices.size()==0) {
+            			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
             		}else {
-            			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+            			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
             		}
         		}
         	}
         	// All Room
-        	template_room = new TupleRoom();
-        	template_room.room_name = TupleSpaceConstants.ALL_ROOM_TEXT;
-        	tuple_room = (TupleRoom) this.space.take(template_room, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-        	if(tuple_room!=null) {
-        		if(tuple_room.contacts.contains(get_user_name())) {
-        			tuple_room.contacts.remove(get_user_name());
-        			this.space.write(tuple_room, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+        	template_env = new TupleEnvironment();
+        	template_env.environment_name = TupleSpaceConstants.ALL_ROOM_TEXT;
+        	tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        	if(tuple_env!=null) {
+        		if(tuple_env.devices.contains(get_device_name())) {
+        			tuple_env.devices.remove(get_device_name());
+        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
         	}
 		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (deselect_room)");
+			System.out.println("Error: TupleSpace (deselect_environment)");
 			return false;
 		}
         return true;
-    }
-    
-    // Message Control
-    public void send_message(String content) {
-        try {
-        	TupleMessage tuple_message  = new TupleMessage();
-        	tuple_message.chat_type     = get_chat_type();
-        	tuple_message.content       = content;
-        	tuple_message.sender_name   = get_user_name();
-        	if(get_chat_type().equals(TupleSpaceConstants.CONTACT_CHAT)) {
-        		//CONTACT_CHAT
-            	tuple_message.receiver_name = get_contact_name();
-            	
-        	}else {
-        		//ROOM_CHAT
-            	tuple_message.room_name     = get_room_name();
-            	tuple_message.receivers     = new ArrayList<String>();
-        	}
-			this.space.write(tuple_message, null, TupleSpaceConstants.TIMER_KEEP_MESSAGE);
-		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (send_message)");
-		}
-    }
-    
-    public TupleMessage receive_message() {
-        try {
-        	if(get_chat_type()==null) { return null; }
-        	TupleMessage template_message  = new TupleMessage();
-        	template_message.chat_type     = get_chat_type();
-        	if(get_chat_type().equals(TupleSpaceConstants.CONTACT_CHAT)) {
-        		//CONTACT_CHAT
-        		template_message.sender_name   = get_contact_name();
-        		template_message.receiver_name = get_user_name();
-        		TupleMessage tuple_message = (TupleMessage) this.space.take(template_message, null, TupleSpaceConstants.TIMER_TAKE_MESSAGE);
-            	if(tuple_message!=null) {
-            		return tuple_message;
-            	}else {
-            		return null;
-            	}
-        	}else {
-        		//ROOM_CHAT
-        		template_message.room_name = get_room_name();
-        		TupleMessage tuple_message = (TupleMessage) this.space.take(template_message, null, TupleSpaceConstants.TIMER_TAKE_MESSAGE);
-            	if(tuple_message!=null) {
-            		List<String> contacts = get_contacts_list(get_room_name());
-            		if(tuple_message.sender_name.equals(get_user_name())) {
-                		if(contacts.size()>1) {
-                			this.space.write(tuple_message, null, TupleSpaceConstants.TIMER_KEEP_MESSAGE);
-                		}
-            			return null;
-            		}
-            		else if(tuple_message.receivers.contains(get_user_name())) {
-            			this.space.write(tuple_message, null, TupleSpaceConstants.TIMER_KEEP_MESSAGE);
-            			return null;
-            		}else {
-            			tuple_message.receivers.add(get_user_name());
-                		if(tuple_message.receivers.size()<contacts.size()-1) {
-                			this.space.write(tuple_message, null, TupleSpaceConstants.TIMER_KEEP_MESSAGE);
-                		}
-                		return tuple_message;
-            		}
-            	}else {
-            		return null;
-            	}
-        	}
-		} catch (Exception e) {
-			System.out.println("Error: TupleSpace (receive_message)");
-			return null;
-		}
     }
     
     // Getters
     public Boolean has_connection() {
     	return this.is_connected;
     }
-    
-    public String get_user_name() {
-    	return this.user_name;
-    }
-    
-    public Boolean get_chat_type() {
+
+    public String get_device_name() {
     	try { mutex.acquire(); } catch (Exception e) {}
-    	Boolean type = this.chat_type;
+    	String device = this.device_name;
     	try { mutex.release(); } catch (Exception e) {}
-    	return type;
+    	return device;
     }
     
-    public String get_contact_name() {
+    public String get_environment_name() {
     	try { mutex.acquire(); } catch (Exception e) {}
-    	String nick = this.contact_name;
-    	try { mutex.release(); } catch (Exception e) {}
-    	return nick;
-    }
-    
-    public String get_room_name() {
-    	try { mutex.acquire(); } catch (Exception e) {}
-    	String room = this.room_name;
+    	String room = this.environment_name;
     	try { mutex.release(); } catch (Exception e) {}
     	return room;
     }
     
     // Setters
-    public void set_chat_type(Boolean type) {
+    public void set_environment_name(String environment_name) {
     	try { mutex.acquire(); } catch (Exception e) {}
-    	this.chat_type = type;
-    	try { mutex.release(); } catch (Exception e) {}
-    }
-    
-    public void set_contact_name(String contact_name) {
-    	try { mutex.acquire(); } catch (Exception e) {}
-    	this.contact_name = contact_name;
-    	try { mutex.release(); } catch (Exception e) {}
-    }
-    
-    public void set_room_name(String room_name) {
-    	try { mutex.acquire(); } catch (Exception e) {}
-    	this.room_name = room_name;
+    	this.environment_name = environment_name;
     	try { mutex.release(); } catch (Exception e) {}
     }
 }
