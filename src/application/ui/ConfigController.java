@@ -18,8 +18,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -27,9 +27,8 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	// FXML Variables
 	@FXML HBox mainHBox;
-	@FXML Label chatLabel;
-	@FXML Button add_btn;
-	@FXML TextField add_tf;
+	@FXML Label uftLabel;
+	@FXML ImageView uftImageView;
 	@FXML ScrollPane contactsScrollPane;
 	@FXML VBox vboxOnScroll;
 	
@@ -51,7 +50,6 @@ public class ConfigController extends Thread implements Initializable  {
 		componentsArray_utils = new ConfigComponentsArrayUtils(this, vboxOnScroll);
 		
 		setupComponents();
-		setAddBtnPressedBehavior();
 		setVBoxScrollsBehavior();
 	}
 	
@@ -86,13 +84,10 @@ public class ConfigController extends Thread implements Initializable  {
 	}
 	
 	private void setupComponents() {
-		chatLabel.setText(ConfigConstants.CHAT_LABEL_TEXT);
-		chatLabel.setStyle(ConfigConstants.CHAT_LABEL_STYLE);
+		uftLabel.setText(ConfigConstants.UFT_LABEL_TEXT);
+		uftLabel.setStyle(ConfigConstants.UFT_LABEL_STYLE);
 		
-		add_tf.setStyle(ConfigConstants.ADD_TEXT_FIELD_STYLE);
-		
-		add_btn.setStyle(ConfigConstants.ADD_BUTTON_STYLE);
-		add_btn.setGraphic(ImageConstants.ADD_BTN_ICON);
+		uftImageView.setImage(ImageConstants.FILE_TRANSMISSION_ICON);
 	}
 	
 	public void setRoomBtnPressedBehavior(TitledPane tp_room, Button b_enter_room, Button b_leave_room) {
@@ -127,22 +122,6 @@ public class ConfigController extends Thread implements Initializable  {
 			ts.set_chat_type(TupleSpaceConstants.CONTACT_CHAT);
         });
 	}
-	
-	private void setAddBtnPressedBehavior() {
-		add_btn.setOnAction((event)->{
-			String room_name = add_tf.getText();
-			add_tf.setText("");
-			if(room_name.equals("")) {
-				return;
-			}
-			do {
-				if(ts.add_room(room_name)) {
-					break;
-				}
-			}while(true);
-
-        });
-    }
 	
 	private void setVBoxScrollsBehavior() {
 		vboxOnScroll.heightProperty().addListener(new ChangeListener<Number>() {
