@@ -74,7 +74,6 @@ public class TupleSpace extends Thread {
     	this.device_name = device_name;
     	this.ip_address = ip_address;
     	this.port_number = port_number;
-    	this.environment_name = "";//*** Define environment at initial procedure
     	set_axis(axis);
     	this.lookup = new Lookup(JavaSpace.class);
 		this.space = (JavaSpace) this.lookup.getService();
@@ -133,9 +132,30 @@ public class TupleSpace extends Thread {
         			tuple_admin.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-        			String env_name = TupleSpaceConstants.PREFIX_ENV+"1";
-            		select_environment(env_name);
-            		set_environment_name(env_name);
+        			tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+        			// calc distance env
+        			Boolean need_to_create = true;
+        			String env_name;
+        			int x_axis_1, y_axis_1, x_axis_2, y_axis_2;
+    				x_axis_1 = get_x_axis();
+    				y_axis_1 = get_y_axis();
+        			for(int i=0; i<tuple_admin.environments.size(); i++) {
+        				x_axis_2 = tuple_admin.environments.get(i).x_axis;
+        				y_axis_2 = tuple_admin.environments.get(i).y_axis;
+        				if(euclidian_distance(x_axis_1, y_axis_1, x_axis_2, y_axis_2)<=TupleSpaceConstants.MAX_ENV_DISTANCE) {
+        					env_name = tuple_admin.environments.get(i).name;
+            				select_environment(env_name);
+                    		set_environment_name(env_name);
+                    		need_to_create = false;
+                    		break;
+        				}
+        			}
+        			if(need_to_create) {
+        				env_name = TupleSpaceConstants.PREFIX_ENV + String.valueOf(tuple_admin.environments.size()+1);
+        				add_environment(env_name);
+        				select_environment(env_name);
+                		set_environment_name(env_name);
+        			}
         		}
         	}
 		} catch (Exception e) {
@@ -246,7 +266,7 @@ public class TupleSpace extends Thread {
         	if(tuple_admin!=null) {
         		int envIndex = tuple_admin.environmentIndex(environment_name);
         		if(envIndex==-1) {
-        			Environment env = new Environment(environment_name, 0, 0);
+        			Environment env = new Environment(environment_name, get_x_axis(), get_y_axis());
         			//Update tuple_admin
         			tuple_admin.environments.add(env);
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
@@ -398,5 +418,9 @@ public class TupleSpace extends Thread {
 		this.x_axis = Integer.valueOf(axis.substring(0, axis.indexOf(",")));
 		this.y_axis = Integer.valueOf(axis.substring(axis.indexOf(",")+1));
     	try { mutex.release(); } catch (Exception e) {}
+    }
+
+    public Double euclidian_distance(Integer x_axis_1, Integer y_axis_1, Integer x_axis_2, Integer y_axis_2) {
+    	return Math.sqrt(Math.pow(x_axis_1-x_axis_2,2)+Math.pow(y_axis_1-y_axis_2,2));
     }
 }

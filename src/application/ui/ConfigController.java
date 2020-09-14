@@ -67,6 +67,11 @@ public class ConfigController extends Thread implements Initializable  {
 			List<Device> ts_devices = ts.get_devices_list();
 			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
 			
+//			System.out.println();
+//			for (int i=0; i<ts_envs.size(); i++)    { System.out.println(ts_envs.get(i));    }
+//			for (int i=0; i<ts_devices.size(); i++) { System.out.println(ts_devices.get(i)); }
+//			System.out.println();
+			
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
