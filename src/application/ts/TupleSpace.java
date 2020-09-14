@@ -188,7 +188,7 @@ public class TupleSpace extends Thread {
         try {
         	TupleEnvironment template_env = new TupleEnvironment();
         	template_env.env_name = environment_name;
-        	TupleEnvironment tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        	TupleEnvironment tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
         	if(tuple_env!=null) {
         		devices = tuple_env.devices;
         	}
@@ -241,7 +241,7 @@ public class TupleSpace extends Thread {
         			tuple_env.env_name = environment_name;
         			tuple_env.env = env;
         			tuple_env.devices = new ArrayList<Device>();
-        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
         	}
 		} catch (Exception e) {
@@ -258,13 +258,13 @@ public class TupleSpace extends Thread {
         	TupleEnvironment tuple_env = new TupleEnvironment();
         	if(!get_environment_name().equals("")) {
         		template_env.env_name = get_environment_name();
-        		tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        		tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
         		if(tuple_env!=null) {
             		int device_index = tuple_env.deviceIndex(get_device_name());
             		if(device_index!=-1) {
             			tuple_env.devices.remove(device_index);
                 		if(tuple_env.devices.size()==0) {
-                			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+                			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
                 		}else {
                 			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
                 		}
@@ -272,11 +272,11 @@ public class TupleSpace extends Thread {
         		}
         	}
         	template_env.env_name = environment_name;
-        	tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        	tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
     		if(tuple_env!=null) {
     			tuple_env.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
         		if(tuple_env.devices.size()==0) {
-        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}else {
         			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
@@ -293,13 +293,13 @@ public class TupleSpace extends Thread {
         	// Common Environment
         	TupleEnvironment template_env = new TupleEnvironment();
         	template_env.env_name = get_environment_name();
-        	TupleEnvironment tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+        	TupleEnvironment tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
         	if(tuple_env!=null) {
         		int device_index = tuple_env.deviceIndex(get_device_name());
         		if(device_index!=-1) {
         			tuple_env.devices.remove(device_index);
             		if(tuple_env.devices.size()==0) {
-            			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+            			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
             		}else {
             			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
             		}
