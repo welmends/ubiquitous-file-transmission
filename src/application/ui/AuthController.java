@@ -67,10 +67,9 @@ public class AuthController implements Initializable {
         	String username     = credentials.get(AuthConstants.HASHCODE_USERNAME);
         	String ip_address   = credentials.get(AuthConstants.HASHCODE_IPADDRESS);
         	Integer port_number = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER));
-        	Integer axis_x      = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_AXIS_X));
-        	Integer axis_y      = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_AXIS_Y));
+        	String axis         = credentials.get(AuthConstants.HASHCODE_AXIS);
         	
-        	if(!ts.connect(username, ip_address, port_number, axis_x, axis_y)) {
+        	if(!ts.connect(username, ip_address, port_number, axis)) {
         		main.closeApplication();
         		Alert alert = new Alert(Alert.AlertType.ERROR);
         		alert.setTitle("Connection Fail");
@@ -124,14 +123,9 @@ public class AuthController implements Initializable {
     		}
     		// axis
     		if(axisTF.getText().equals("")) {
-        		credentials.put(AuthConstants.HASHCODE_AXIS_X, AuthConstants.DEFAULT_AXIS_X_OR_Y);
-        		credentials.put(AuthConstants.HASHCODE_AXIS_Y, AuthConstants.DEFAULT_AXIS_X_OR_Y);
+        		credentials.put(AuthConstants.HASHCODE_AXIS, AuthConstants.DEFAULT_AXIS);
     		}else {
-    			String axis = axisTF.getText();
-    			String x_axis = axis.substring(0, axis.indexOf(","));
-    			String y_axis = axis.substring(axis.indexOf(",")+1);
-        		credentials.put(AuthConstants.HASHCODE_AXIS_X, x_axis);
-        		credentials.put(AuthConstants.HASHCODE_AXIS_Y, y_axis);
+    			credentials.put(AuthConstants.HASHCODE_AXIS, axisTF.getText());
     		}
     		return true;
     	}

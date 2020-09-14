@@ -144,16 +144,8 @@ public class ConfigComponentsArrayUtils {
 		Label l_axis = new Label();
 		l_axis.setText("("+String.valueOf(env.x_axis)+","+String.valueOf(env.y_axis)+")");
 		l_axis.setStyle(ConfigConstants.TITLED_PANE_STYLE);
-		
-		Button b_enter = new Button();
-		b_enter.setText(ConfigConstants.ENTER_ROOM_BUTTON_TEXT);
-		b_enter.setStyle(ConfigConstants.ROOM_BUTTON_STYLE);
-		
-		Button b_leave = new Button();
-		b_leave.setText(ConfigConstants.LEAVE_ROOM_BUTTON_TEXT);
-		b_leave.setStyle(ConfigConstants.ROOM_BUTTON_STYLE);
 
-		h.getChildren().addAll(l_axis, b_enter, b_leave);
+		h.getChildren().addAll(l_axis);
 		
 		TitledPane tp = new TitledPane();
 		tp.setText(env.name);
@@ -166,8 +158,6 @@ public class ConfigComponentsArrayUtils {
 			tp.getWidth() - h.getLayoutX() - h.getWidth() - ConfigConstants.ROOM_BUTTON_GRAPHIC_MARGIN_RIGHT, tp.widthProperty())
 		);
 		
-		config.setEnvBtnPressedBehavior(tp, b_enter, b_leave);
-		
 		envs_components.add(tp);
 		
         vboxOnScroll.getChildren().add(tp);
@@ -176,15 +166,16 @@ public class ConfigComponentsArrayUtils {
 	private void add_device_button(String ts_device_name, Environment env, Device device) {
 		Label l_axis = new Label();
 		l_axis.setText("("+String.valueOf(device.x_axis)+","+String.valueOf(device.y_axis)+")");
-		l_axis.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
+		l_axis.setStyle(ConfigConstants.DEVICE_STYLE);
 		
 		Button b = new Button();
 		b.setText(device.name);
-		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
+		b.setStyle(ConfigConstants.DEVICE_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
-		config.setDeviceBtnPressedBehavior(b);
 		if(device.name.equals(ts_device_name)) {
-			b.setDisable(true);
+			config.setDeviceBtnPressedBehavior(b, true);
+		}else {
+			config.setDeviceBtnPressedBehavior(b, false);
 		}
 		b.setGraphic(l_axis);
 		
@@ -203,15 +194,16 @@ public class ConfigComponentsArrayUtils {
 	private void add_device_button_on_all(String ts_device_name, Device device) {
 		Label l_axis = new Label();
 		l_axis.setText("("+String.valueOf(device.x_axis)+","+String.valueOf(device.y_axis)+")");
-		l_axis.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
+		l_axis.setStyle(ConfigConstants.DEVICE_STYLE);
 		
 		Button b = new Button();
 		b.setText(device.name);
-		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
+		b.setStyle(ConfigConstants.DEVICE_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
-		config.setDeviceBtnPressedBehavior(b);
 		if(device.name.equals(ts_device_name)) {
-			b.setDisable(true);
+			config.setDeviceBtnPressedBehavior(b, true);
+		}else {
+			config.setDeviceBtnPressedBehavior(b, false);
 		}
 		b.setGraphic(l_axis);
 		

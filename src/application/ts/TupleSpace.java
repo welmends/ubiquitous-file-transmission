@@ -73,13 +73,12 @@ public class TupleSpace extends Thread {
 	}
 	
 	// Connection
-    public Boolean connect(String device_name, String ip_address, Integer port_number, Integer x_axis, Integer y_axis){
+    public Boolean connect(String device_name, String ip_address, Integer port_number, String axis){
     	this.device_name = device_name;
     	this.ip_address = ip_address;
     	this.port_number = port_number;
     	//Define environment at initial procedure
-    	this.x_axis = x_axis;
-    	this.y_axis = y_axis;
+    	set_axis(axis);
     	this.lookup = new Lookup(JavaSpace.class);
 		this.space = (JavaSpace) this.lookup.getService();
 		this.space_admin = (JavaSpace) this.lookup.getService();
@@ -366,6 +365,13 @@ public class TupleSpace extends Thread {
     public void set_y_axis(Integer y) {
     	try { mutex.acquire(); } catch (Exception e) {}
     	this.y_axis = y;
+    	try { mutex.release(); } catch (Exception e) {}
+    }
+    
+    public void set_axis(String axis) {
+    	try { mutex.acquire(); } catch (Exception e) {}
+		this.x_axis = Integer.valueOf(axis.substring(0, axis.indexOf(",")));
+		this.y_axis = Integer.valueOf(axis.substring(axis.indexOf(",")+1));
     	try { mutex.release(); } catch (Exception e) {}
     }
 }

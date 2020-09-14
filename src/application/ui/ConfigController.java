@@ -19,7 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -91,33 +91,33 @@ public class ConfigController extends Thread implements Initializable  {
 		uftImageView.setImage(ImageConstants.FILE_TRANSMISSION_ICON);
 	}
 	
-	public void setEnvBtnPressedBehavior(TitledPane tp_env, Button b_enter_env, Button b_leave_env) {
-		b_enter_env.setOnAction((event)->{
-			do {
-				if(ts.select_environment(tp_env.getText())) {
-					break;
+	public void setDeviceBtnPressedBehavior(Button b_device, Boolean opt) {
+		if(opt) {
+			b_device.setOnAction((event)->{
+				TextInputDialog td = new TextInputDialog("");
+				td.setResizable(false);
+				td.setTitle("Setup Axis");
+				td.setHeaderText("x-axis,y-axis");
+				td.showAndWait();
+				
+				String axis = td.getResult();
+				if(axis!=null) {
+					ts.set_axis(axis);
+					//Update device tuple
+					//Possible change of environment...
+					
+					Label l_axis = new Label();
+					l_axis.setText("("+axis+")");
+					l_axis.setStyle(ConfigConstants.DEVICE_STYLE);
+					b_device.setGraphic(l_axis);
 				}
-			}while(true);
-			
-			ts.set_environment_name(tp_env.getText());
-        });
-		
-		b_leave_env.setOnAction((event)->{
-			if(ts.get_environment_name().equals(tp_env.getText())) {
-				do {
-					if(ts.deselect_environment()) {
-						break;
-					}
-				}while(true);
-				ts.set_environment_name("");
-			}
-        });
-    }
-	
-	public void setDeviceBtnPressedBehavior(Button b_device) {
-		b_device.setOnAction((event)->{
-			//...
-        });
+	        });
+		}else {
+			b_device.setOnAction((event)->{
+				//Send File...
+				System.out.println("Use javafx.stage.FileChooser to select file!");
+	        });
+		}
 	}
 	
 	private void setVBoxScrollsBehavior() {
