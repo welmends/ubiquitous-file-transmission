@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import application.ts.Device;
+import application.ts.Environment;
 import application.ts.TupleSpaceConstants;
 import application.ui.ConfigController;
 import application.ui.constants.ConfigConstants;
@@ -33,7 +35,7 @@ public class ConfigComponentsArrayUtils {
 		this.contacts_components_on_all = new ArrayList<Button>();
 	}
 	
-	public void init_all_env(String ts_user_name) {
+	public void init_all_env(String ts_device_name) {
 		TitledPane tp = new TitledPane();
 		tp.setText(TupleSpaceConstants.ALL_ROOM_TEXT);
 		tp.setStyle(ConfigConstants.TITLED_PANE_STYLE);
@@ -44,31 +46,31 @@ public class ConfigComponentsArrayUtils {
 		
         vboxOnScroll.getChildren().add(tp);
         
-        add_contact_button_on_all(ts_user_name, ts_user_name);
+        add_contact_button_on_all(ts_device_name, ts_device_name);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void updateComponentsList(String user_name, List<String> ts_envs, List<String> ts_devices, HashMap<String, String> ts_hash) {
+	public void updateComponentsList(String device_name, List<Environment> ts_envs, List<Device> ts_devices, HashMap<String, String> ts_hash) {
 		Boolean add_del;
 		
 		// All Room
 		for (int i=0; i<ts_devices.size(); i++) {
 			add_del = true;
 			for (int j=0; j<contacts_components_on_all.size(); j++) {
-				if(ts_devices.get(i).equals(contacts_components_on_all.get(j).getText())) {
+				if(ts_devices.get(i).name.equals(contacts_components_on_all.get(j).getText())) {
 					add_del = false;
 					break;
 				}
 			}
 			if(add_del) {
-				add_contact_button_on_all(user_name, ts_devices.get(i));
+				add_contact_button_on_all(device_name, ts_devices.get(i).name);
 			}
 		}
 		
 		for (int i=0; i<contacts_components_on_all.size(); i++) {
 			add_del = true;
 			for (int j=0; j<ts_devices.size(); j++) {
-				if(contacts_components_on_all.get(i).getText().equals(ts_devices.get(j))) {
+				if(contacts_components_on_all.get(i).getText().equals(ts_devices.get(j).name)) {
 					add_del = false;
 					break;
 				}
@@ -80,25 +82,25 @@ public class ConfigComponentsArrayUtils {
 		
 		// Common Rooms
 		for (int i=0; i<ts_envs.size(); i++) {
-			if(ts_envs.get(i).equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
+			if(ts_envs.get(i).name.equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
 				continue;
 			}
 			add_del = true;
 			for (int j=0; j<envs_components.size(); j++) {
-				if(ts_envs.get(i).equals(envs_components.get(j).getText())) {
+				if(ts_envs.get(i).name.equals(envs_components.get(j).getText())) {
 					add_del = false;
 					break;
 				}
 			}
 			if(add_del) {
-				add_room_titledPane(ts_envs.get(i));
+				add_room_titledPane(ts_envs.get(i).name);
 			}
 		}
 		
 		for (int i=0; i<envs_components.size(); i++) {
 			add_del = true;
 			for (int j=0; j<ts_envs.size(); j++) {
-				if(envs_components.get(i).getText().equals(ts_envs.get(j))) {
+				if(envs_components.get(i).getText().equals(ts_envs.get(j).name)) {
 					add_del = false;
 					break;
 				}
@@ -113,10 +115,10 @@ public class ConfigComponentsArrayUtils {
 			if(hash.containsKey(key)) {
 				if(!hash.get(key).equals(value)) {
 					del_contact_button(hash.get(key), key);
-					add_contact_button(user_name, value, key);
+					add_contact_button(device_name, value, key);
 				}
 			}else {
-				add_contact_button(user_name, value, key);
+				add_contact_button(device_name, value, key);
 			}
 		});
 		
@@ -124,7 +126,7 @@ public class ConfigComponentsArrayUtils {
 			if(ts_hash.containsKey(key)) {
 				if(!ts_hash.get(key).equals(value)) {
 					del_contact_button(value, key);
-					add_contact_button(user_name, ts_hash.get(key), key);
+					add_contact_button(device_name, ts_hash.get(key), key);
 				}
 			}else {
 				del_contact_button(value, key);
@@ -166,13 +168,13 @@ public class ConfigComponentsArrayUtils {
         vboxOnScroll.getChildren().add(tp);
 	}
 	
-	private void add_contact_button(String ts_user_name, String room_name, String contact_name) {
+	private void add_contact_button(String ts_device_name, String room_name, String contact_name) {
 		Button b = new Button();
 		b.setText(contact_name);
 		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
 		config.setDeviceBtnPressedBehavior(b);
-		if(contact_name.equals(ts_user_name)) {
+		if(contact_name.equals(ts_device_name)) {
 			b.setDisable(true);
 		}
 		
@@ -188,13 +190,13 @@ public class ConfigComponentsArrayUtils {
 		hash.put(contact_name, room_name);
 	}
 	
-	private void add_contact_button_on_all(String ts_user_name, String contact_name) {
+	private void add_contact_button_on_all(String ts_device_name, String contact_name) {
 		Button b = new Button();
 		b.setText(contact_name);
 		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
 		config.setDeviceBtnPressedBehavior(b);
-		if(contact_name.equals(ts_user_name)) {
+		if(contact_name.equals(ts_device_name)) {
 			b.setDisable(true);
 		}
 		

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import application.ts.Device;
+import application.ts.Environment;
 import application.ts.TupleSpace;
 import application.ui.constants.ConfigConstants;
 import application.ui.constants.ImageConstants;
@@ -68,9 +70,9 @@ public class ConfigController extends Thread implements Initializable  {
 				System.out.println("Error: ConfigController (thread)");
 			}
 			
-			List<String> ts_envs = ts.get_environments_list();
-			List<String> ts_devices = ts.get_devices_list();
-			HashMap<String, String> ts_hash = ts.get_hash_environments_devices();
+			List<Environment> ts_envs = ts.get_environments_list();
+			List<Device> ts_devices = ts.get_devices_list();
+			HashMap<String, String> ts_hash = ts.get_hash_devices_environments();
 			
 			Platform.runLater(new Runnable() {
 				@Override

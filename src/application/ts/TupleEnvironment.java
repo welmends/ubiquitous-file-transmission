@@ -6,10 +6,18 @@ import net.jini.core.entry.Entry;
 
 @SuppressWarnings("serial")
 public class TupleEnvironment implements Entry {
-	public String environment_name;
-	public List<String> devices;
+	public String env_name;
+	public Environment env;
+	public List<Device> devices;
     
-    public TupleEnvironment() {
-    	
+    public TupleEnvironment() {}
+    
+    public Integer deviceIndex(String device_name) {
+    	for(int i=0; i<devices.size(); i++) {
+    		if(devices.get(i).name.equals(device_name)) {
+    			return i;
+    		}
+    	}
+    	return -1;
     }
 }
