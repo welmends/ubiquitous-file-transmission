@@ -26,7 +26,7 @@ public class ConfigConstants {
 	// Specific Constants
 	public static Double CONTACT_BUTTON_PREF_WIDTH = 235.0;
 	public static Double ROOM_BUTTON_GRAPHIC_MARGIN_RIGHT = 5.0;
-	public static ContentDisplay ROOM_BUTTON_CONTENT_DISPLAY = ContentDisplay.RIGHT;
+	public static ContentDisplay DEFAULT_CONTENT_DISPLAY = ContentDisplay.RIGHT;
 	
 	
 }

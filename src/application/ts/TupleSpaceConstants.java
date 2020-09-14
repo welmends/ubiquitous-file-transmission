@@ -12,5 +12,5 @@ public class TupleSpaceConstants {
 	public static Long TIMER_TAKE_MESSAGE   = JavaSpace.NO_WAIT; // 2sec
 	public static Long TIMER_NO_WAIT        = JavaSpace.NO_WAIT; // 0sec
 	
-	public static String ALL_ROOM_TEXT = "Main Env";
+	public static String PREFIX_ENV         = "Env_";
 }

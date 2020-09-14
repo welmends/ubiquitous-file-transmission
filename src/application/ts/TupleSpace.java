@@ -48,9 +48,6 @@ public class TupleSpace extends Thread {
 	        	if(tuple_admin!=null) {
 	        		TupleEnvironment template_env = new TupleEnvironment();
 	        		for (int i=0; i<tuple_admin.environments.size(); i++) {
-	        			if(tuple_admin.environments.get(i).name.equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
-	        				continue;
-	        			}
 	        			template_env.env_name = tuple_admin.environments.get(i).name;
 						TupleEnvironment tuple_env = (TupleEnvironment) this.space_admin.read(template_env, null, TupleSpaceConstants.TIMER_NO_WAIT);
 						if(tuple_env==null) {
@@ -77,7 +74,7 @@ public class TupleSpace extends Thread {
     	this.device_name = device_name;
     	this.ip_address = ip_address;
     	this.port_number = port_number;
-    	//Define environment at initial procedure
+    	this.environment_name = "";//*** Define environment at initial procedure
     	set_axis(axis);
     	this.lookup = new Lookup(JavaSpace.class);
 		this.space = (JavaSpace) this.lookup.getService();
@@ -122,15 +119,13 @@ public class TupleSpace extends Thread {
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin==null) {
         		template_admin.environments = new ArrayList<Environment>();
-        		template_admin.environments.add(new Environment(TupleSpaceConstants.ALL_ROOM_TEXT, 0, 0));
         		template_admin.devices = new ArrayList<Device>();
         		template_admin.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
         		this.space.write(template_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-    			TupleEnvironment tuple_env = new TupleEnvironment();
-    			tuple_env.env_name = TupleSpaceConstants.ALL_ROOM_TEXT;
-    			tuple_env.env = new Environment(TupleSpaceConstants.ALL_ROOM_TEXT, 0, 0);
-    			tuple_env.devices = new ArrayList<Device>();
-    			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+        		String env_name = TupleSpaceConstants.PREFIX_ENV+"1";
+        		add_environment(env_name);
+        		select_environment(env_name);
+        		set_environment_name(env_name);
         	}else {
         		if(tuple_admin.deviceIndex(get_device_name())!=-1) {
         			return false;
@@ -138,6 +133,9 @@ public class TupleSpace extends Thread {
         			tuple_admin.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+        			String env_name = TupleSpaceConstants.PREFIX_ENV+"1";
+            		select_environment(env_name);
+            		set_environment_name(env_name);
         		}
         	}
 		} catch (Exception e) {
@@ -151,9 +149,6 @@ public class TupleSpace extends Thread {
     	List<Environment> envs = get_environments_list();
     	List<Device> devices;
     	for (int i=0; i<envs.size(); i++) {
-    		if(envs.get(i).name.equals(TupleSpaceConstants.ALL_ROOM_TEXT)) {
-    			continue;
-    		}
     		devices = get_devices_list(envs.get(i).name);
 	    	for (int j=0; j<devices.size(); j++) {
 	    		hash.put(devices.get(j), envs.get(i));
@@ -221,7 +216,6 @@ public class TupleSpace extends Thread {
         			TupleEnvironment template_env = new TupleEnvironment();
 	        		for (int i=0; i<tuple_admin.environments.size(); i++) {
 	        			template_env.env_name = tuple_admin.environments.get(i).name;
-	        			System.out.println("> "+template_env.env_name);
 						TupleEnvironment tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
 						if(tuple_env!=null) {
 							deviceIndex = tuple_env.deviceIndex(get_device_name());
@@ -251,20 +245,23 @@ public class TupleSpace extends Thread {
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         	if(tuple_admin!=null) {
         		int envIndex = tuple_admin.environmentIndex(environment_name);
-        		if(envIndex!=-1) {
+        		if(envIndex==-1) {
+        			Environment env = new Environment(environment_name, 0, 0);
         			//Update tuple_admin
-        			tuple_admin.environments.add(new Environment(environment_name, 0, 0));
+        			tuple_admin.environments.add(env);
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-        			//Create tuple_room
+        			//Create tuple_env
         			TupleEnvironment tuple_env = new TupleEnvironment();
         			tuple_env.env_name = environment_name;
+        			tuple_env.env = env;
         			tuple_env.devices = new ArrayList<Device>();
         			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
         		}
         	}
 		} catch (Exception e) {
 			System.out.println("Error: TupleSpace (add_environment)");
+			System.out.println(e);
 			return false;
 		}
         return true;
@@ -289,7 +286,7 @@ public class TupleSpace extends Thread {
             		}
         		}
         	}
-        	template_env.env_name = get_environment_name();
+        	template_env.env_name = environment_name;
         	tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
     		if(tuple_env!=null) {
     			tuple_env.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
@@ -321,17 +318,6 @@ public class TupleSpace extends Thread {
             		}else {
             			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
             		}
-        		}
-        	}
-        	// All Room
-        	template_env = new TupleEnvironment();
-        	template_env.env_name = TupleSpaceConstants.ALL_ROOM_TEXT;
-        	tuple_env = (TupleEnvironment) this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-        	if(tuple_env!=null) {
-        		int device_index = tuple_env.deviceIndex(get_device_name());
-        		if(device_index!=-1) {
-        			tuple_env.devices.remove(device_index);
-        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         		}
         	}
 		} catch (Exception e) {
