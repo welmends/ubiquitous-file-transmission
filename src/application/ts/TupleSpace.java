@@ -148,8 +148,8 @@ public class TupleSpace extends Thread {
         return true;
     }
     
-    public HashMap<String, String> get_hash_devices_environments() {
-    	HashMap<String, String> hash = new HashMap<String, String>();
+    public HashMap<Device, Environment> get_hash_devices_environments() {
+    	HashMap<Device, Environment> hash = new HashMap<Device, Environment>();
     	List<Environment> envs = get_environments_list();
     	List<Device> devices;
     	for (int i=0; i<envs.size(); i++) {
@@ -158,7 +158,7 @@ public class TupleSpace extends Thread {
     		}
     		devices = get_devices_list(envs.get(i).name);
 	    	for (int j=0; j<devices.size(); j++) {
-	    		hash.put(devices.get(j).name, envs.get(i).name);
+	    		hash.put(devices.get(j), envs.get(i));
 			}
 		}
     	return hash;

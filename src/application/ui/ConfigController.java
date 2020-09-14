@@ -59,7 +59,7 @@ public class ConfigController extends Thread implements Initializable  {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				componentsArray_utils.init_all_env(ts.get_device_name());
+				componentsArray_utils.init_all_env(ts.get_device_name(), ts.get_x_axis(), ts.get_y_axis());
 			}
 		});
 		
@@ -72,7 +72,7 @@ public class ConfigController extends Thread implements Initializable  {
 			
 			List<Environment> ts_envs = ts.get_environments_list();
 			List<Device> ts_devices = ts.get_devices_list();
-			HashMap<String, String> ts_hash = ts.get_hash_devices_environments();
+			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
 			
 			Platform.runLater(new Runnable() {
 				@Override
