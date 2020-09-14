@@ -15,4 +15,8 @@ public class Environment implements Serializable {
 		this.x_axis = x_axis;
 		this.y_axis = y_axis;
 	}
+	
+	public String toString() {
+		return "Env: "+this.name+" -> "+String.valueOf(this.x_axis)+","+String.valueOf(this.y_axis);
+	}
 }

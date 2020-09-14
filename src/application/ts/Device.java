@@ -19,4 +19,8 @@ public class Device implements Serializable {
 		this.ip_address = ip_address;
 		this.port_number = port_number;
 	}
+	
+	public String toString() {
+		return "Dev: "+this.name+" -> "+String.valueOf(this.x_axis)+","+String.valueOf(this.y_axis);
+	}
 }

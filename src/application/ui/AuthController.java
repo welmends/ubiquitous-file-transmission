@@ -87,8 +87,6 @@ public class AuthController implements Initializable {
             		alert.showAndWait();
             		disableComponents(false);
             		return;
-        		}else {
-        			//chat.chatLabelUser.setText(ts.get_user_name());
         		}
         	}
         	

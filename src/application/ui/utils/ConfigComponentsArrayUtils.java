@@ -134,6 +134,17 @@ public class ConfigComponentsArrayUtils {
 			}
 		});
 		
+		// Update (axis)
+		ts_hash.forEach((key1, value1) -> {
+			((HashMap<Device, Environment>) hash.clone()).forEach((key2, value2) -> {
+				if(key1.x_axis!=key2.x_axis || key1.y_axis!=key2.y_axis) {
+					del_device_button(value2.name, key2.name);
+					add_device_button(ts_device_name, value1, key1);
+				}
+			});
+			
+		});
+		
         vboxOnScroll.applyCss();
         vboxOnScroll.layout();
 	}

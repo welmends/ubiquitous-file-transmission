@@ -74,6 +74,15 @@ public class ConfigController extends Thread implements Initializable  {
 			List<Device> ts_devices = ts.get_devices_list();
 			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
 			
+//			System.out.println();
+//			for (int i=0; i<ts_envs.size(); i++) {
+//				System.out.println(ts_envs.get(i));
+//			}
+//			for (int i=0; i<ts_devices.size(); i++) {
+//				System.out.println(ts_devices.get(i));
+//			}
+//			System.out.println();
+			
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
@@ -103,7 +112,12 @@ public class ConfigController extends Thread implements Initializable  {
 				String axis = td.getResult();
 				if(axis!=null) {
 					ts.set_axis(axis);
-					//Update device tuple
+					do {
+						if(ts.update_device()) {
+							break;
+						}
+					}while(true);
+					
 					//Possible change of environment...
 					
 					Label l_axis = new Label();

@@ -142,7 +142,6 @@ public class TupleSpace extends Thread {
         	}
 		} catch (Exception e) {
 			System.out.println("Error: TupleSpace (init_admin_tuple)");
-			System.out.println(e);
 		}
         return true;
     }
@@ -204,6 +203,46 @@ public class TupleSpace extends Thread {
 			System.out.println("Error: TupleSpace (get_devices_list)");
 		}
         return devices;
+    }
+    
+    public Boolean update_device() {
+    	try {
+        	TupleAdmin template_admin = new TupleAdmin();
+        	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+        	if(tuple_admin!=null) {
+        		int deviceIndex = tuple_admin.deviceIndex(get_device_name());
+        		if(deviceIndex==-1) {
+        			return false;
+        		}else {
+        			tuple_admin.devices.get(deviceIndex).x_axis = get_x_axis();
+        			tuple_admin.devices.get(deviceIndex).y_axis = get_y_axis();
+        			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+        			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+        			TupleEnvironment template_env = new TupleEnvironment();
+	        		for (int i=0; i<tuple_admin.environments.size(); i++) {
+	        			template_env.env_name = tuple_admin.environments.get(i).name;
+	        			System.out.println("> "+template_env.env_name);
+						TupleEnvironment tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+						if(tuple_env!=null) {
+							deviceIndex = tuple_env.deviceIndex(get_device_name());
+							if(deviceIndex!=-1) {
+								tuple_env.devices.get(deviceIndex).x_axis = get_x_axis();
+								tuple_env.devices.get(deviceIndex).y_axis = get_y_axis();
+			        			this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
+			        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
+			        			return true;
+							}
+						}
+					}
+	        		return false;
+        		}
+        	}else {
+        		return false;
+        	}
+		} catch (Exception e) {
+			System.out.println("Error: TupleSpace (update_device)");
+		}
+        return true;
     }
     
     public Boolean add_environment(String environment_name) {
