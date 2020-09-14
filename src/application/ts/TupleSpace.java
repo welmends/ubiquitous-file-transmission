@@ -133,29 +133,7 @@ public class TupleSpace extends Thread {
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
         			tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
-        			// calc distance env
-        			Boolean need_to_create = true;
-        			String env_name;
-        			int x_axis_1, y_axis_1, x_axis_2, y_axis_2;
-    				x_axis_1 = get_x_axis();
-    				y_axis_1 = get_y_axis();
-        			for(int i=0; i<tuple_admin.environments.size(); i++) {
-        				x_axis_2 = tuple_admin.environments.get(i).x_axis;
-        				y_axis_2 = tuple_admin.environments.get(i).y_axis;
-        				if(euclidian_distance(x_axis_1, y_axis_1, x_axis_2, y_axis_2)<=TupleSpaceConstants.MAX_ENV_DISTANCE) {
-        					env_name = tuple_admin.environments.get(i).name;
-            				select_environment(env_name);
-                    		set_environment_name(env_name);
-                    		need_to_create = false;
-                    		break;
-        				}
-        			}
-        			if(need_to_create) {
-        				env_name = TupleSpaceConstants.PREFIX_ENV + String.valueOf(tuple_admin.environments.size()+1);
-        				add_environment(env_name);
-        				select_environment(env_name);
-                		set_environment_name(env_name);
-        			}
+        			define_environment(tuple_admin.environments);
         		}
         	}
 		} catch (Exception e) {
@@ -233,22 +211,9 @@ public class TupleSpace extends Thread {
         			tuple_admin.devices.get(deviceIndex).y_axis = get_y_axis();
         			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-        			TupleEnvironment template_env = new TupleEnvironment();
-	        		for (int i=0; i<tuple_admin.environments.size(); i++) {
-	        			template_env.env_name = tuple_admin.environments.get(i).name;
-						TupleEnvironment tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-						if(tuple_env!=null) {
-							deviceIndex = tuple_env.deviceIndex(get_device_name());
-							if(deviceIndex!=-1) {
-								tuple_env.devices.get(deviceIndex).x_axis = get_x_axis();
-								tuple_env.devices.get(deviceIndex).y_axis = get_y_axis();
-			        			this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ROOM);
-			        			this.space.write(tuple_env, null, TupleSpaceConstants.TIMER_KEEP_ROOM);
-			        			return true;
-							}
-						}
-					}
-	        		return false;
+        			tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+        			define_environment(tuple_admin.environments);
+	        		return true;
         		}
         	}else {
         		return false;
@@ -420,6 +385,32 @@ public class TupleSpace extends Thread {
     	try { mutex.release(); } catch (Exception e) {}
     }
 
+    // Utils
+    public void define_environment(List<Environment> envs) throws Exception {
+		Boolean need_to_create = true;
+		String env_name;
+		int x_axis_1, y_axis_1, x_axis_2, y_axis_2;
+		x_axis_1 = get_x_axis();
+		y_axis_1 = get_y_axis();
+		for(int i=0; i<envs.size(); i++) {
+			x_axis_2 = envs.get(i).x_axis;
+			y_axis_2 = envs.get(i).y_axis;
+			if(euclidian_distance(x_axis_1, y_axis_1, x_axis_2, y_axis_2)<=TupleSpaceConstants.MAX_ENV_DISTANCE) {
+				env_name = envs.get(i).name;
+				select_environment(env_name);
+        		set_environment_name(env_name);
+        		need_to_create = false;
+        		break;
+			}
+		}
+		if(need_to_create) {
+			env_name = TupleSpaceConstants.PREFIX_ENV + String.valueOf(envs.size()+1);
+			add_environment(env_name);
+			select_environment(env_name);
+    		set_environment_name(env_name);
+		}
+    }
+    
     public Double euclidian_distance(Integer x_axis_1, Integer y_axis_1, Integer x_axis_2, Integer y_axis_2) {
     	return Math.sqrt(Math.pow(x_axis_1-x_axis_2,2)+Math.pow(y_axis_1-y_axis_2,2));
     }
