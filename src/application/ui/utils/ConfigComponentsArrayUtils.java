@@ -11,6 +11,7 @@ import application.ui.ConfigController;
 import application.ui.constants.ConfigConstants;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -140,6 +141,10 @@ public class ConfigComponentsArrayUtils {
 	private void add_env_titledPane(Environment env) {
 		HBox h = new HBox();
 		
+		Label l_axis = new Label();
+		l_axis.setText("("+String.valueOf(env.x_axis)+","+String.valueOf(env.y_axis)+")");
+		l_axis.setStyle(ConfigConstants.TITLED_PANE_STYLE);
+		
 		Button b_enter = new Button();
 		b_enter.setText(ConfigConstants.ENTER_ROOM_BUTTON_TEXT);
 		b_enter.setStyle(ConfigConstants.ROOM_BUTTON_STYLE);
@@ -148,10 +153,10 @@ public class ConfigComponentsArrayUtils {
 		b_leave.setText(ConfigConstants.LEAVE_ROOM_BUTTON_TEXT);
 		b_leave.setStyle(ConfigConstants.ROOM_BUTTON_STYLE);
 
-		h.getChildren().addAll(b_enter, b_leave);
+		h.getChildren().addAll(l_axis, b_enter, b_leave);
 		
 		TitledPane tp = new TitledPane();
-		tp.setText(env.name + " ("+String.valueOf(env.x_axis)+","+String.valueOf(env.y_axis)+")");
+		tp.setText(env.name);
 		tp.setStyle(ConfigConstants.TITLED_PANE_STYLE);
 		tp.setContentDisplay(ConfigConstants.ROOM_BUTTON_CONTENT_DISPLAY);
 		tp.setGraphic(h);
@@ -169,14 +174,19 @@ public class ConfigComponentsArrayUtils {
 	}
 	
 	private void add_device_button(String ts_device_name, Environment env, Device device) {
+		Label l_axis = new Label();
+		l_axis.setText("("+String.valueOf(device.x_axis)+","+String.valueOf(device.y_axis)+")");
+		l_axis.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
+		
 		Button b = new Button();
-		b.setText(device.name + " ("+String.valueOf(device.x_axis)+","+String.valueOf(device.y_axis)+")");
+		b.setText(device.name);
 		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
 		config.setDeviceBtnPressedBehavior(b);
 		if(device.name.equals(ts_device_name)) {
 			b.setDisable(true);
 		}
+		b.setGraphic(l_axis);
 		
 		devices_components.add(b);
 		
@@ -191,14 +201,19 @@ public class ConfigComponentsArrayUtils {
 	}
 	
 	private void add_device_button_on_all(String ts_device_name, Device device) {
+		Label l_axis = new Label();
+		l_axis.setText("("+String.valueOf(device.x_axis)+","+String.valueOf(device.y_axis)+")");
+		l_axis.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
+		
 		Button b = new Button();
-		b.setText(device.name + " ("+String.valueOf(device.x_axis)+","+String.valueOf(device.y_axis)+")");
+		b.setText(device.name);
 		b.setStyle(ConfigConstants.CONTACT_BUTTON_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
 		config.setDeviceBtnPressedBehavior(b);
 		if(device.name.equals(ts_device_name)) {
 			b.setDisable(true);
 		}
+		b.setGraphic(l_axis);
 		
 		devices_components_on_all.add(b);
 		
