@@ -33,7 +33,7 @@ public class ConfigComponentsArrayUtils {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void updateComponentsList(String ts_device_name, List<Environment> ts_envs, List<Device> ts_devices, HashMap<Device, Environment> ts_hash) {
+	public void updateComponentsList(String ts_device_name, String ts_env_name, List<Environment> ts_envs, List<Device> ts_devices, HashMap<Device, Environment> ts_hash) {
 		Boolean add_del;
 		
 		// Environments
@@ -104,6 +104,17 @@ public class ConfigComponentsArrayUtils {
 			}
 			if(alter==false) {
 				del_device_button(local.getValue(), local.getKey());
+			}
+		}
+		
+		for (int i=0; i<devices_components.size(); i++) {
+			devices_components.get(i).setDisable(false);
+			for (Map.Entry<Device, Environment> local : hash.entrySet()) {
+				if(devices_components.get(i).getText().equals(local.getKey().name)) {
+					if(!ts_env_name.equals(local.getValue().name)) {
+						devices_components.get(i).setDisable(true);
+					}
+				}
 			}
 		}
 		

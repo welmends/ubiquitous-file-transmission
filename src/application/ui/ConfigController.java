@@ -86,7 +86,7 @@ public class ConfigController extends Thread implements Initializable  {
 					@Override
 					public void run() {
 						Alert alert = new Alert(Alert.AlertType.INFORMATION);
-						alert.setTitle("Alert ("+ts.get_device_name()+")");
+						alert.setTitle("File Received");
 						alert.setResizable(false);
 						alert.setHeaderText("Device "+pair.getKey()+" send a file:\n"+pair.getValue());
 						alert.showAndWait();
@@ -101,7 +101,7 @@ public class ConfigController extends Thread implements Initializable  {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-					componentsArray_utils.updateComponentsList(ts.get_device_name(), ts_envs, ts_devices, ts_hash);
+					componentsArray_utils.updateComponentsList(ts.get_device_name(), ts.get_environment_name(), ts_envs, ts_devices, ts_hash);
 				}
 			});
 		}
@@ -151,7 +151,7 @@ public class ConfigController extends Thread implements Initializable  {
 			        }
 	    		}else {
     				Alert alert = new Alert(Alert.AlertType.ERROR);
-    				alert.setTitle("Alert ("+ts.get_device_name()+")");
+    				alert.setTitle("Connection Information");
     				alert.setResizable(false);
     				alert.setHeaderText("Connection Unsuccessful!");
     				alert.showAndWait();
