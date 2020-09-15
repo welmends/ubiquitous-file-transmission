@@ -198,6 +198,23 @@ public class TupleSpace extends Thread {
         return devices;
     }
     
+    public Device get_device(String device_name) {
+    	Device device = null;
+        try {
+        	TupleAdmin template_admin = new TupleAdmin();
+        	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+        	if(tuple_admin!=null) {
+        		int deviceIndex = tuple_admin.deviceIndex(device_name);
+        		if(deviceIndex!=-1) {
+        			device = tuple_admin.devices.get(deviceIndex);
+        		}
+        	}
+		} catch (Exception e) {
+			System.out.println("Error: TupleSpace (get_device)");
+		}
+        return device;
+    }
+    
     public Boolean update_device() {
     	try {
         	TupleAdmin template_admin = new TupleAdmin();

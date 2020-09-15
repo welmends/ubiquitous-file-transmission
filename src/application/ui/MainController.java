@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import application.Main;
 import application.MainConstants;
+import application.socket.SocketP2P;
 import application.ts.TupleSpace;
 import application.ui.constants.FXMLConstants;
 import application.ui.constants.ImageConstants;
@@ -33,6 +34,8 @@ public class MainController implements Initializable {
 	
 	// COM Variables
 	private TupleSpace ts;
+	private SocketP2P p2p_server;
+	private SocketP2P p2p_client;
 	
 	// Controllers
 	private ConfigController configController;
@@ -47,6 +50,8 @@ public class MainController implements Initializable {
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
 		ts = new TupleSpace();
+		p2p_server = new SocketP2P();
+		p2p_client = new SocketP2P();
 		
 		Scene configScene = null;
 		
@@ -69,11 +74,13 @@ public class MainController implements Initializable {
 		authentication();
 		
 		// Load common objects from parent
-		configController.loadFromParent(ts);
+		configController.loadFromParent(ts, p2p_server, p2p_client);
 	}
 	
 	public void closeApplication() {
 		ts.disconnect();
+		p2p_server.disconnect(true);
+		p2p_client.disconnect(true);
 	}
 
     private Boolean authentication() {

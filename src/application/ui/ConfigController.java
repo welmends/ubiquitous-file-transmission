@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import application.socket.SocketP2P;
 import application.ts.Device;
 import application.ts.Environment;
 import application.ts.TupleSpace;
@@ -16,6 +17,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -35,14 +37,18 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	// COM Variables
 	private TupleSpace ts;
+	private SocketP2P p2p_server;
+	private SocketP2P p2p_client;
 	
 	// Controllers
 	
 	// Variables
 	private ConfigComponentsArrayUtils componentsArray_utils;
 	
-	public void loadFromParent(TupleSpace ts) {
+	public void loadFromParent(TupleSpace ts, SocketP2P p2p_server, SocketP2P p2p_client) {
 		this.ts = ts;
+		this.p2p_server = p2p_server;
+		this.p2p_client = p2p_client;
 	}
 	
 	@Override
@@ -56,6 +62,13 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	@Override
 	public void run() {
+		try {
+			Thread.sleep(ConfigConstants.THREAD_SLEEP_TIME_MILLIS);
+		} catch (InterruptedException e) {
+			System.out.println("Error: ConfigController (thread)");
+		}
+		p2p_server.setup(ts.get_ip_address(), ts.get_port_number());
+		p2p_server.run_server();
 		while(true) {
 			try {
 				Thread.sleep(ConfigConstants.THREAD_SLEEP_TIME_MILLIS);
@@ -67,11 +80,6 @@ public class ConfigController extends Thread implements Initializable  {
 			List<Device> ts_devices = ts.get_devices_list();
 			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
 			
-//			System.out.println();
-//			for (int i=0; i<ts_envs.size(); i++)    { System.out.println(ts_envs.get(i));    }
-//			for (int i=0; i<ts_devices.size(); i++) { System.out.println(ts_devices.get(i)); }
-//			System.out.println();
-			
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
@@ -79,6 +87,13 @@ public class ConfigController extends Thread implements Initializable  {
 				}
 			});
 			
+			if(p2p_server.has_connection()) {
+				if(p2p_server.chat_stack_full()) {
+					String msg = p2p_server.get_chat_msg();
+					System.out.println(msg+" -> "+ts.get_device_name());
+					p2p_server.disconnect(false);
+				}
+			}
 		}
 	}
 	
@@ -107,8 +122,6 @@ public class ConfigController extends Thread implements Initializable  {
 						}
 					}while(true);
 					
-					//Possible change of environment...
-					
 					Label l_axis = new Label();
 					l_axis.setText("("+axis+")");
 					l_axis.setStyle(ConfigConstants.DEVICE_STYLE);
@@ -117,8 +130,24 @@ public class ConfigController extends Thread implements Initializable  {
 	        });
 		}else {
 			b_device.setOnAction((event)->{
-				//Send File...
-				System.out.println("Use javafx.stage.FileChooser to select file!");
+				Device dev = ts.get_device(b_device.getText());
+				p2p_client.setup(dev.ip_address, dev.port_number);
+				if(p2p_client.connect()) {
+					String msg = ts.get_device_name();
+					p2p_client.send_chat_msg_call(msg);
+					//p2p_client.disconnect(false);
+//					FileChooser chooser = new FileChooser();
+//					File file = chooser.showOpenDialog(new Stage());
+//			        if (file != null) {
+//			        	p2p_client.send_file_call(file);
+//			        }
+	    		}else {
+    				Alert alert = new Alert(Alert.AlertType.ERROR);
+    				alert.setTitle("Alert");
+    				alert.setResizable(false);
+    				alert.setHeaderText("Conexão mal sucedida!");
+    				alert.showAndWait();
+	    		}
 	        });
 		}
 	}
