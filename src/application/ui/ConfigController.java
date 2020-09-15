@@ -1,5 +1,6 @@
 package application.ui;
 
+import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,8 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class ConfigController extends Thread implements Initializable  {
 	
@@ -76,13 +79,15 @@ public class ConfigController extends Thread implements Initializable  {
 				System.out.println("Error: ConfigController (thread)");
 			}
 			
-			if(p2p_server.has_connection()) {
-				if(p2p_server.chat_stack_full()) {
-					String msg = p2p_server.get_chat_msg();
-					System.out.println(msg+" -> "+ts.get_device_name());
-					p2p_server.disconnect(false);
-				}
-			}
+//			if(p2p_server.has_connection()) {
+//				if(p2p_server.chat_stack_full()) {
+//					File file = new File("/Users/well/Downloads/s.txt");
+//					p2p_server.receive_file_call(file);
+////					String msg = p2p_server.get_chat_msg();
+////					System.out.println(msg+" -> "+ts.get_device_name());
+//					p2p_server.disconnect(false);
+//				}
+//			}
 			
 			List<Environment> ts_envs = ts.get_environments_list();
 			List<Device> ts_devices = ts.get_devices_list();
@@ -133,14 +138,14 @@ public class ConfigController extends Thread implements Initializable  {
 				Device dev = ts.get_device(b_device.getText());
 				p2p_client.setup(dev.ip_address, dev.port_number);
 				if(p2p_client.connect()) {
-					String msg = ts.get_device_name();
-					p2p_client.send_chat_msg_call(msg);
-					//p2p_client.disconnect(false);
-//					FileChooser chooser = new FileChooser();
-//					File file = chooser.showOpenDialog(new Stage());
-//			        if (file != null) {
-//			        	p2p_client.send_file_call(file);
-//			        }
+//					String msg = ts.get_device_name();
+//					p2p_client.send_chat_msg_call(msg);
+					FileChooser chooser = new FileChooser();
+					File file = chooser.showOpenDialog(new Stage());
+			        if (file != null) {
+			        	p2p_client.send_file_call(file);
+			        	p2p_client.disconnect(false);
+			        }
 	    		}else {
     				Alert alert = new Alert(Alert.AlertType.ERROR);
     				alert.setTitle("Alert");
