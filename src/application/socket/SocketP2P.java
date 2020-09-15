@@ -83,7 +83,7 @@ public class SocketP2P implements Runnable {
         		    ByteBuffer bb = ByteBuffer.wrap(resultBuff);
         		    bb.get(file_name, 0, file_name.length);
         		    bb.get(file_content, 0, file_content.length);
-        			OutputStream os = new FileOutputStream(new File("/Users/well/Downloads/"+new String(file_name, "UTF-8").replace(" ", ""))); 
+        			OutputStream os = new FileOutputStream(new File(new String(file_name, "UTF-8").replace(" ", ""))); 
         			os.write(file_content);
         			os.close();
                     is_connected = false;
