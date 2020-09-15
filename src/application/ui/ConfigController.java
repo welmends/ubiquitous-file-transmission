@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 public class ConfigController extends Thread implements Initializable  {
 	
@@ -79,15 +80,19 @@ public class ConfigController extends Thread implements Initializable  {
 				System.out.println("Error: ConfigController (thread)");
 			}
 			
-//			if(p2p_server.has_connection()) {
-//				if(p2p_server.chat_stack_full()) {
-//					File file = new File("/Users/well/Downloads/s.txt");
-//					p2p_server.receive_file_call(file);
-////					String msg = p2p_server.get_chat_msg();
-////					System.out.println(msg+" -> "+ts.get_device_name());
-//					p2p_server.disconnect(false);
-//				}
-//			}
+			Pair<String, String> pair = p2p_server.receive_file_call();
+			if(pair!=null) {
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						Alert alert = new Alert(Alert.AlertType.INFORMATION);
+						alert.setTitle("Alert ("+ts.get_device_name()+")");
+						alert.setResizable(false);
+						alert.setHeaderText("Device "+pair.getKey()+" send a file:\n"+pair.getValue());
+						alert.showAndWait();
+					}
+				});
+			}
 			
 			List<Environment> ts_envs = ts.get_environments_list();
 			List<Device> ts_devices = ts.get_devices_list();
@@ -138,19 +143,17 @@ public class ConfigController extends Thread implements Initializable  {
 				Device dev = ts.get_device(b_device.getText());
 				p2p_client.setup(dev.ip_address, dev.port_number);
 				if(p2p_client.connect()) {
-//					String msg = ts.get_device_name();
-//					p2p_client.send_chat_msg_call(msg);
 					FileChooser chooser = new FileChooser();
 					File file = chooser.showOpenDialog(new Stage());
 			        if (file != null) {
-			        	p2p_client.send_file_call(file);
+			        	p2p_client.send_file_call(file, ts.get_device_name());
 			        	p2p_client.disconnect(false);
 			        }
 	    		}else {
     				Alert alert = new Alert(Alert.AlertType.ERROR);
-    				alert.setTitle("Alert");
+    				alert.setTitle("Alert ("+ts.get_device_name()+")");
     				alert.setResizable(false);
-    				alert.setHeaderText("Conexão mal sucedida!");
+    				alert.setHeaderText("Connection Unsuccessful!");
     				alert.showAndWait();
 	    		}
 	        });

@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.util.concurrent.Semaphore;
 
+import javafx.util.Pair;
+
 import java.io.*;
 
 public class SocketP2P implements Runnable {
@@ -17,8 +19,8 @@ public class SocketP2P implements Runnable {
     private DataInputStream input_stream  = null;
     private DataOutputStream output_stream = null;
     
-    private String message_input = "";
-    private String message_output = "";
+    private String device_socket = "";
+    private String filepath_socket = "";
     
     private int thread_action;
     
@@ -69,6 +71,7 @@ public class SocketP2P implements Runnable {
         	if(thread_action==2) {
     			//RECEIVE INFORMATION
         		try {
+        			//Socket receiving...
         		    byte[] resultBuff = new byte[0];
         		    byte[] buff = new byte[1024];
         		    int k = -1;
@@ -78,14 +81,25 @@ public class SocketP2P implements Runnable {
         		        System.arraycopy(buff, 0, tbuff, resultBuff.length, k);  // copy current lot
         		        resultBuff = tbuff; // call the temp buffer as your result buff
         		    }
+        		    //Process data...
+        		    byte[] device_name = new byte[P2PConstants.DEVICENAME_BYTE_SIZE];
         		    byte[] file_name = new byte[P2PConstants.FILENAME_BYTE_SIZE];
-        		    byte[] file_content = new byte[resultBuff.length-P2PConstants.FILENAME_BYTE_SIZE];
+        		    byte[] file_content = new byte[resultBuff.length-P2PConstants.DEVICENAME_BYTE_SIZE-P2PConstants.FILENAME_BYTE_SIZE];
         		    ByteBuffer bb = ByteBuffer.wrap(resultBuff);
+        		    bb.get(device_name, 0, device_name.length);
         		    bb.get(file_name, 0, file_name.length);
         		    bb.get(file_content, 0, file_content.length);
-        			OutputStream os = new FileOutputStream(new File(new String(file_name, "UTF-8").replace(" ", ""))); 
+        		    String str_device_name = new String(device_name, "UTF-8").replace(" ", "");
+        		    String str_file_name = new String(file_name, "UTF-8").replace(" ", "");
+        		    //Save file...
+        			OutputStream os = new FileOutputStream(new File(str_file_name));
         			os.write(file_content);
         			os.close();
+        			//Finish the job...
+    				mutex.acquire();
+    				device_socket = str_device_name;
+    				filepath_socket = System.getProperty("user.dir") + "/" + str_file_name;
+    		    	mutex.release();
                     is_connected = false;
                     thread_action = 1;
                 } catch(Exception e) {
@@ -167,90 +181,37 @@ public class SocketP2P implements Runnable {
     }
     
     // File methods
-    public Boolean file_stack_full() {
-    	String message_received = "";
+	public Pair<String, String> receive_file_call() {
+		Pair<String, String> pair = null;
+		
+		String device = "";
+    	String filepath = "";
 		try {
 			mutex.acquire();
-			message_received = message_input;
+			device = device_socket;
+			filepath = filepath_socket;
 	    	mutex.release();
+	    	if(!device.equals("")) {
+				mutex.acquire();
+				filepath_socket = "";
+				device_socket = "";
+		    	mutex.release();
+		    	pair = new Pair<String, String>(device, filepath);
+	    	}
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-
-    	if(message_received.length()>0) {
-    		if(P2PConstants.CHAT_CODEC.equals(message_received.substring(0,P2PConstants.CHAT_CODEC.length()))) {
-    			return true;
-    		}else {
-    			return false;
-    		}
-    	}else {
-    		return false;
-    	}
-    }
-
-	public void receive_file_call(File file) {
-    	String message_received = "";
-		try {
-			mutex.acquire();
-			message_received = message_input;
-			message_input = "";
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
+		return pair;
 	}
 	
-	public void send_file_call(File file) {
+	public void send_file_call(File file, String sender_device_name) {
 		try {
+			byte[] device_name = new byte[P2PConstants.DEVICENAME_BYTE_SIZE];
 			byte[] file_name = new byte[P2PConstants.FILENAME_BYTE_SIZE];
-			file_name = String.format("%1$"+P2PConstants.FILENAME_BYTE_SIZE+"s", file.getName()).getBytes();
 			byte[] file_content = Files.readAllBytes(file.toPath());
-			output_stream.write(ByteBuffer.allocate(file_name.length + file_content.length).put(file_name).put(file_content).array());
-			output_stream.flush();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-    
-	// Chat methods
-    public Boolean chat_stack_full() {
-    	String message_received = "";
-		try {
-			mutex.acquire();
-			message_received = message_input;
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-
-    	if(message_received.length()>0) {
-    		if(P2PConstants.CHAT_CODEC.equals(message_received.substring(0,P2PConstants.CHAT_CODEC.length()))) {
-    			return true;
-    		}else {
-    			return false;
-    		}
-    	}else {
-    		return false;
-    	}
-    }
-
-	public String get_chat_msg() {
-    	String message_received = "";
-		try {
-			mutex.acquire();
-			message_received = message_input;
-			message_input = "";
-	    	mutex.release();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-    	return message_received.substring(P2PConstants.CHAT_CODEC.length(),message_received.length());
-	}
-	
-	public void send_chat_msg_call(String msg) {
-		try {
-			message_output = P2PConstants.CHAT_CODEC + msg;
-			output_stream.writeUTF(message_output);
+			device_name = String.format("%1$"+P2PConstants.DEVICENAME_BYTE_SIZE+"s", sender_device_name).getBytes();
+			file_name = String.format("%1$"+P2PConstants.FILENAME_BYTE_SIZE+"s", file.getName()).getBytes();
+			output_stream.write(ByteBuffer.allocate(device_name.length + file_name.length + file_content.length).put(device_name).put(file_name).put(file_content).array());
 			output_stream.flush();
 		} catch (Exception e) {
 			System.out.println(e);
