@@ -82,9 +82,9 @@ public class SocketP2P implements Runnable {
         		        resultBuff = tbuff; // call the temp buffer as your result buff
         		    }
         		    //Process data...
-        		    byte[] device_name = new byte[P2PConstants.DEVICENAME_BYTE_SIZE];
-        		    byte[] file_name = new byte[P2PConstants.FILENAME_BYTE_SIZE];
-        		    byte[] file_content = new byte[resultBuff.length-P2PConstants.DEVICENAME_BYTE_SIZE-P2PConstants.FILENAME_BYTE_SIZE];
+        		    byte[] device_name = new byte[SocketConstants.DEVICENAME_BYTE_SIZE];
+        		    byte[] file_name = new byte[SocketConstants.FILENAME_BYTE_SIZE];
+        		    byte[] file_content = new byte[resultBuff.length-SocketConstants.DEVICENAME_BYTE_SIZE-SocketConstants.FILENAME_BYTE_SIZE];
         		    ByteBuffer bb = ByteBuffer.wrap(resultBuff);
         		    bb.get(device_name, 0, device_name.length);
         		    bb.get(file_name, 0, file_name.length);
@@ -206,11 +206,11 @@ public class SocketP2P implements Runnable {
 	
 	public void send_file_call(File file, String sender_device_name) {
 		try {
-			byte[] device_name = new byte[P2PConstants.DEVICENAME_BYTE_SIZE];
-			byte[] file_name = new byte[P2PConstants.FILENAME_BYTE_SIZE];
+			byte[] device_name = new byte[SocketConstants.DEVICENAME_BYTE_SIZE];
+			byte[] file_name = new byte[SocketConstants.FILENAME_BYTE_SIZE];
 			byte[] file_content = Files.readAllBytes(file.toPath());
-			device_name = String.format("%1$"+P2PConstants.DEVICENAME_BYTE_SIZE+"s", sender_device_name).getBytes();
-			file_name = String.format("%1$"+P2PConstants.FILENAME_BYTE_SIZE+"s", file.getName()).getBytes();
+			device_name = String.format("%1$"+SocketConstants.DEVICENAME_BYTE_SIZE+"s", sender_device_name).getBytes();
+			file_name = String.format("%1$"+SocketConstants.FILENAME_BYTE_SIZE+"s", file.getName()).getBytes();
 			output_stream.write(ByteBuffer.allocate(device_name.length + file_name.length + file_content.length).put(device_name).put(file_name).put(file_content).array());
 			output_stream.flush();
 		} catch (Exception e) {
