@@ -76,6 +76,14 @@ public class ConfigController extends Thread implements Initializable  {
 				System.out.println("Error: ConfigController (thread)");
 			}
 			
+			if(p2p_server.has_connection()) {
+				if(p2p_server.chat_stack_full()) {
+					String msg = p2p_server.get_chat_msg();
+					System.out.println(msg+" -> "+ts.get_device_name());
+					p2p_server.disconnect(false);
+				}
+			}
+			
 			List<Environment> ts_envs = ts.get_environments_list();
 			List<Device> ts_devices = ts.get_devices_list();
 			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
@@ -86,14 +94,6 @@ public class ConfigController extends Thread implements Initializable  {
 					componentsArray_utils.updateComponentsList(ts.get_device_name(), ts_envs, ts_devices, ts_hash);
 				}
 			});
-			
-			if(p2p_server.has_connection()) {
-				if(p2p_server.chat_stack_full()) {
-					String msg = p2p_server.get_chat_msg();
-					System.out.println(msg+" -> "+ts.get_device_name());
-					p2p_server.disconnect(false);
-				}
-			}
 		}
 	}
 	
