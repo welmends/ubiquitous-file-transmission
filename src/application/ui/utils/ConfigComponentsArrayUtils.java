@@ -9,11 +9,9 @@ import application.ts.Device;
 import application.ts.Environment;
 import application.ui.ConfigController;
 import application.ui.constants.ConfigConstants;
-import javafx.beans.binding.Bindings;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ConfigComponentsArrayUtils {
@@ -66,55 +64,36 @@ public class ConfigComponentsArrayUtils {
 		// Devices
 		Boolean alter;
 		for (Map.Entry<Device, Environment> remote : ts_hash.entrySet()) {
-			alter = false;
+			alter = true;
 			for (Map.Entry<Device, Environment> local : ((HashMap<Device, Environment>) hash.clone()).entrySet()) {
-				if(remote.getKey().name.equals(local.getKey().name)) {
-					alter = true;
-					if(!remote.getValue().name.equals(local.getValue().name)) {
-						del_device_button(local.getValue(), local.getKey());
-						add_device_button(ts_device_name, remote.getValue(), remote.getKey());
-					}
-					else if(!remote.getKey().x_axis.equals(local.getKey().x_axis) || !remote.getKey().y_axis.equals(local.getKey().y_axis)) {
+				if(remote.getKey().name.equals(local.getKey().name) && remote.getValue().name.equals(local.getValue().name)) {
+					alter = false;
+					if(!remote.getKey().x_axis.equals(local.getKey().x_axis) || !remote.getKey().y_axis.equals(local.getKey().y_axis)) {
 						del_device_button(local.getValue(), local.getKey());
 						add_device_button(ts_device_name, remote.getValue(), remote.getKey());
 					}
 					break;
 				}
 			}
-			if(alter==false) {
+			if(alter) {
 				add_device_button(ts_device_name, remote.getValue(), remote.getKey());
 			}
 		}
 		
 		for (Map.Entry<Device, Environment> local : ((HashMap<Device, Environment>) hash.clone()).entrySet()) {
-			alter = false;
+			alter = true;
 			for (Map.Entry<Device, Environment> remote : ts_hash.entrySet()) {
-				if(local.getKey().name.equals(remote.getKey().name)) {
-					alter = true;
-					if(!local.getValue().name.equals(remote.getValue().name)) {
-						del_device_button(local.getValue(), local.getKey());
-						add_device_button(ts_device_name, remote.getValue(), remote.getKey());
-					}
-					else if(!remote.getKey().x_axis.equals(local.getKey().x_axis) || !remote.getKey().y_axis.equals(local.getKey().y_axis)) {
+				if(local.getKey().name.equals(remote.getKey().name) && local.getValue().name.equals(remote.getValue().name)) {
+					alter = false;
+					if(!remote.getKey().x_axis.equals(local.getKey().x_axis) || !remote.getKey().y_axis.equals(local.getKey().y_axis)) {
 						del_device_button(local.getValue(), local.getKey());
 						add_device_button(ts_device_name, remote.getValue(), remote.getKey());
 					}
 					break;
 				}
 			}
-			if(alter==false) {
+			if(alter) {
 				del_device_button(local.getValue(), local.getKey());
-			}
-		}
-		
-		for (int i=0; i<devices_components.size(); i++) {
-			devices_components.get(i).setDisable(false);
-			for (Map.Entry<Device, Environment> local : hash.entrySet()) {
-				if(devices_components.get(i).getText().equals(local.getKey().name)) {
-					if(!ts_env_name.equals(local.getValue().name)) {
-						devices_components.get(i).setDisable(true);
-					}
-				}
 			}
 		}
 		
@@ -123,24 +102,11 @@ public class ConfigComponentsArrayUtils {
 	}
 	
 	private void add_env_titledPane(Environment env) {
-		HBox h = new HBox();
-		
-		Label l_axis = new Label();
-		l_axis.setText("("+String.valueOf(env.x_axis)+","+String.valueOf(env.y_axis)+")");
-		l_axis.setStyle(ConfigConstants.TITLED_PANE_STYLE);
-
-		h.getChildren().addAll(l_axis);
-		
 		TitledPane tp = new TitledPane();
 		tp.setText(env.name);
 		tp.setStyle(ConfigConstants.TITLED_PANE_STYLE);
 		tp.setContentDisplay(ConfigConstants.DEFAULT_CONTENT_DISPLAY);
-		tp.setGraphic(h);
 		tp.setContent(new VBox());
-		
-		h.translateXProperty().bind(Bindings.createDoubleBinding(() -> 
-			tp.getWidth() - h.getLayoutX() - h.getWidth() - ConfigConstants.ROOM_BUTTON_GRAPHIC_MARGIN_RIGHT, tp.widthProperty())
-		);
 		
 		envs_components.add(tp);
 		
@@ -156,14 +122,14 @@ public class ConfigComponentsArrayUtils {
 		b.setText(device.name);
 		b.setStyle(ConfigConstants.DEVICE_STYLE);
 		b.setPrefWidth(ConfigConstants.CONTACT_BUTTON_PREF_WIDTH);
-		if(device.name.equals(ts_device_name)) {
-			b.setStyle(ConfigConstants.DEVICE_STYLE+" -fx-background-color: darkgray; -fx-border-color: gray;");
-			config.setDeviceBtnPressedBehavior(b, true);
-		}else {
-			config.setDeviceBtnPressedBehavior(b, false);
-		}
 		b.setContentDisplay(ConfigConstants.DEFAULT_CONTENT_DISPLAY);
 		b.setGraphic(l_axis);
+		if(device.name.equals(ts_device_name)) {
+			b.setStyle(ConfigConstants.DEVICE_STYLE+" -fx-background-color: darkgray; -fx-border-color: gray;");
+			config.setDeviceBtnPressedBehavior(env.name, device.name, b, true);
+		}else {
+			config.setDeviceBtnPressedBehavior(env.name, device.name, b, false);
+		}
 		
 		devices_components.add(b);
 		
@@ -171,6 +137,7 @@ public class ConfigComponentsArrayUtils {
 			if(envs_components.get(i).getText().equals(env.name)) {
 				VBox content = (VBox) envs_components.get(i).getContent();
 				content.getChildren().add(b);
+				break;
 			}
 		}
 		
@@ -193,9 +160,11 @@ public class ConfigComponentsArrayUtils {
 				for (int j=0; j<devices_components.size(); j++) {
 					if(devices_components.get(j).getText().equals(device.name)) {
 						VBox content = (VBox) envs_components.get(i).getContent();
-						content.getChildren().remove(devices_components.get(j));
-						devices_components.remove(j);
-		        		break;
+						if(content.getChildren().contains(devices_components.get(j))){
+							content.getChildren().remove(devices_components.get(j));
+							devices_components.remove(j);
+							break;
+						}
 					}
 				}
 				break;

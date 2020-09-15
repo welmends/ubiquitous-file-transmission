@@ -20,4 +20,14 @@ public class TupleEnvironment implements Entry {
     	}
     	return -1;
     }
+    
+    public Integer deviceAmount(String device_name) {
+    	int count = 0;
+    	for(int i=0; i<devices.size(); i++) {
+    		if(devices.get(i).name.equals(device_name)) {
+    			count+=1;
+    		}
+    	}
+    	return count;
+    }
 }

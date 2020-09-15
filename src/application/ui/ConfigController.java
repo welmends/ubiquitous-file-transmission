@@ -114,7 +114,7 @@ public class ConfigController extends Thread implements Initializable  {
 		uftImageView.setImage(ImageConstants.FILE_TRANSMISSION_ICON);
 	}
 	
-	public void setDeviceBtnPressedBehavior(Button b_device, Boolean opt) {
+	public void setDeviceBtnPressedBehavior(String env_name, String device_name, Button b_device, Boolean opt) {
 		if(opt) {
 			b_device.setOnAction((event)->{
 				TextInputDialog td = new TextInputDialog("");
@@ -140,7 +140,7 @@ public class ConfigController extends Thread implements Initializable  {
 	        });
 		}else {
 			b_device.setOnAction((event)->{
-				Device dev = ts.get_device(b_device.getText());
+				Device dev = ts.get_device(device_name, env_name);
 				socket_file_client.setup(dev.ip_address, dev.port_number);
 				if(socket_file_client.connect()) {
 					FileChooser chooser = new FileChooser();

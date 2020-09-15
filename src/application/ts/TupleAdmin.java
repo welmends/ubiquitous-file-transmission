@@ -20,12 +20,30 @@ public class TupleAdmin implements Entry {
     	return -1;
     }
     
-    public Integer deviceIndex(String device_name) {
+    public Integer deviceIndex(String device_name, String environment_name) {
+    	int degree = 1;
+    	if(environment_name.indexOf("_")!=environment_name.lastIndexOf("_")) {
+    		degree = Integer.valueOf(environment_name.substring(environment_name.lastIndexOf("_")+1));
+    	}
     	for(int i=0; i<devices.size(); i++) {
     		if(devices.get(i).name.equals(device_name)) {
-    			return i;
+    			if(degree==1) {
+    				return i;
+    			}else {
+    				degree-=1;
+    			}
     		}
     	}
     	return -1;
+    }
+    
+    public Integer deviceAmount(String device_name) {
+    	int count = 0;
+    	for(int i=0; i<devices.size(); i++) {
+    		if(devices.get(i).name.equals(device_name)) {
+    			count+=1;
+    		}
+    	}
+    	return count;
     }
 }
