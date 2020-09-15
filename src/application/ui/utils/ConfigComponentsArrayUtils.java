@@ -44,7 +44,7 @@ public class ConfigComponentsArrayUtils {
 				}
 			}
 			if(add_del) {
-				add_env_titledPane(ts_envs.get(i));
+				add_env_titledPane(ts_env_name, ts_envs.get(i));
 			}
 		}
 		
@@ -101,12 +101,17 @@ public class ConfigComponentsArrayUtils {
         vboxOnScroll.layout();
 	}
 	
-	private void add_env_titledPane(Environment env) {
+	private void add_env_titledPane(String ts_env_name, Environment env) {
 		TitledPane tp = new TitledPane();
 		tp.setText(env.name);
 		tp.setStyle(ConfigConstants.TITLED_PANE_STYLE);
 		tp.setContentDisplay(ConfigConstants.DEFAULT_CONTENT_DISPLAY);
 		tp.setContent(new VBox());
+		if(!tp.getText().equals(ts_env_name)) {
+			tp.setDisable(true);    
+			tp.setExpanded(false); //***>>> Set true to see environments content
+			//return;              //***>>> Uncomment to not show other environments 
+		}
 		
 		envs_components.add(tp);
 		
