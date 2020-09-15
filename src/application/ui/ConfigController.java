@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import application.socket.SocketP2P;
+import application.socket.SocketFile;
 import application.ts.Device;
 import application.ts.Environment;
 import application.ts.TupleSpace;
@@ -41,18 +41,18 @@ public class ConfigController extends Thread implements Initializable  {
 	
 	// COM Variables
 	private TupleSpace ts;
-	private SocketP2P p2p_server;
-	private SocketP2P p2p_client;
+	private SocketFile socket_file_server;
+	private SocketFile socket_file_client;
 	
 	// Controllers
 	
 	// Variables
 	private ConfigComponentsArrayUtils componentsArray_utils;
 	
-	public void loadFromParent(TupleSpace ts, SocketP2P p2p_server, SocketP2P p2p_client) {
+	public void loadFromParent(TupleSpace ts, SocketFile socket_file_server, SocketFile socket_file_client) {
 		this.ts = ts;
-		this.p2p_server = p2p_server;
-		this.p2p_client = p2p_client;
+		this.socket_file_server = socket_file_server;
+		this.socket_file_client = socket_file_client;
 	}
 	
 	@Override
@@ -71,8 +71,8 @@ public class ConfigController extends Thread implements Initializable  {
 		} catch (InterruptedException e) {
 			System.out.println("Error: ConfigController (thread)");
 		}
-		p2p_server.setup(ts.get_ip_address(), ts.get_port_number());
-		p2p_server.run_server();
+		socket_file_server.setup(ts.get_ip_address(), ts.get_port_number());
+		socket_file_server.run_server();
 		while(true) {
 			try {
 				Thread.sleep(ConfigConstants.THREAD_SLEEP_TIME_MILLIS);
@@ -80,7 +80,7 @@ public class ConfigController extends Thread implements Initializable  {
 				System.out.println("Error: ConfigController (thread)");
 			}
 			
-			Pair<String, String> pair = p2p_server.receive_file_call();
+			Pair<String, String> pair = socket_file_server.receive_file_call();
 			if(pair!=null) {
 				Platform.runLater(new Runnable() {
 					@Override
@@ -141,13 +141,13 @@ public class ConfigController extends Thread implements Initializable  {
 		}else {
 			b_device.setOnAction((event)->{
 				Device dev = ts.get_device(b_device.getText());
-				p2p_client.setup(dev.ip_address, dev.port_number);
-				if(p2p_client.connect()) {
+				socket_file_client.setup(dev.ip_address, dev.port_number);
+				if(socket_file_client.connect()) {
 					FileChooser chooser = new FileChooser();
 					File file = chooser.showOpenDialog(new Stage());
 			        if (file != null) {
-			        	p2p_client.send_file_call(file, ts.get_device_name());
-			        	p2p_client.disconnect(false);
+			        	socket_file_client.send_file_call(file, ts.get_device_name());
+			        	socket_file_client.disconnect(false);
 			        }
 	    		}else {
     				Alert alert = new Alert(Alert.AlertType.ERROR);

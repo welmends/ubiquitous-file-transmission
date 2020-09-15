@@ -9,7 +9,7 @@ import javafx.util.Pair;
 
 import java.io.*;
 
-public class SocketP2P implements Runnable {
+public class SocketFile implements Runnable {
 	
 	private Semaphore mutex;
 	
@@ -29,7 +29,7 @@ public class SocketP2P implements Runnable {
     private String ip;
     private int port;
     
-    public SocketP2P() {
+    public SocketFile() {
     	mutex = new Semaphore(1);
     	
     	this.thread_action = 1;
