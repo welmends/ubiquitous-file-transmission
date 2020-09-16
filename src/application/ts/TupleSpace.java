@@ -109,6 +109,9 @@ public class TupleSpace extends Thread {
         	this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
         	//Update tuples_environments
         	for(int i=0; i<tuple_admin.environments.size(); i++) {
+        		if(get_environment_name().contains(tuple_admin.environments.get(i).name) || tuple_admin.environments.get(i).name.contains(get_environment_name())) {
+        			continue;
+        		}
     			template_env = new TupleEnvironment();
     			template_env.env_name = tuple_admin.environments.get(i).name;
     			tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
@@ -145,9 +148,7 @@ public class TupleSpace extends Thread {
         		select_environment(env_name);
         		set_environment_name(env_name);
         	}else {
-        		System.out.println("my port: "+get_port_number());
         		for(int i=0; i<tuple_admin.devices.size(); i++) {
-        			System.out.println(tuple_admin.devices.get(i).port_number);
         			if(tuple_admin.devices.get(i).port_number.equals(get_port_number())) {
         				return false;
         			}
@@ -493,4 +494,5 @@ public class TupleSpace extends Thread {
     public Double euclidian_distance(Integer x_axis_1, Integer y_axis_1, Integer x_axis_2, Integer y_axis_2) {
     	return Math.sqrt(Math.pow(x_axis_1-x_axis_2,2)+Math.pow(y_axis_1-y_axis_2,2));
     }
+
 }
