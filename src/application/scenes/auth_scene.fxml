@@ -36,7 +36,7 @@
       </HBox>
       <HBox alignment="CENTER" layoutX="30.0" layoutY="67.0">
          <children>
-            <TextField fx:id="ipTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Ip Address" style="-fx-background-radius: 5em;">
+            <TextField fx:id="ipTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Device IP address" style="-fx-background-radius: 5em;">
                <font>
                   <Font size="11.0" />
                </font>
@@ -48,7 +48,31 @@
       </HBox>
       <HBox alignment="CENTER" layoutX="30.0" layoutY="67.0">
          <children>
-            <TextField fx:id="portTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Port number" style="-fx-background-radius: 5em;">
+            <TextField fx:id="portTF" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Device port number" style="-fx-background-radius: 5em;">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER">
+         <children>
+            <TextField fx:id="ipTF2" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Server IP address" style="-fx-background-radius: 5em;">
+               <font>
+                  <Font size="11.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER">
+         <children>
+            <TextField fx:id="portTF2" alignment="CENTER" prefHeight="25.0" prefWidth="175.0" promptText="Server port number" style="-fx-background-radius: 5em;">
                <font>
                   <Font size="11.0" />
                </font>

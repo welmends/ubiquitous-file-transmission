@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
-import application.ts.TupleSpace;
+import application.socket.SocketTS;
 import application.ui.constants.AuthConstants;
 import application.ui.constants.ImageConstants;
 import javafx.application.Platform;
@@ -21,11 +21,13 @@ public class AuthController implements Initializable {
     @FXML private TextField deviceTF;
     @FXML private TextField ipTF;
     @FXML private TextField portTF;
+    @FXML private TextField ipTF2;
+    @FXML private TextField portTF2;
     @FXML private TextField axisTF;
     @FXML private Button enterButton;
     
 	// COM Variables
-    private TupleSpace ts;
+    private SocketTS socket_TS_client;
 	
 	// Variables
     private Stage stage = null;
@@ -34,8 +36,8 @@ public class AuthController implements Initializable {
     private MainController main;
     private ConfigController config;
     
-    public AuthController(TupleSpace ts, MainController main, ConfigController config) {
-    	this.ts = ts;
+    public AuthController(SocketTS socket_TS_client, MainController main, ConfigController config) {
+    	this.socket_TS_client = socket_TS_client;
     	this.main = main;
     	this.config = config;
     }
@@ -51,7 +53,7 @@ public class AuthController implements Initializable {
     }
     
     private void closeStage() {
-    	ts.start();
+    	socket_TS_client.ts_start();
     	config.start();
         if(stage!=null) {
             stage.close();
@@ -64,12 +66,14 @@ public class AuthController implements Initializable {
     			return;
     		}
         	disableComponents(true);
-        	String username     = credentials.get(AuthConstants.HASHCODE_USERNAME);
-        	String ip_address   = credentials.get(AuthConstants.HASHCODE_IPADDRESS);
-        	Integer port_number = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER));
-        	String axis         = credentials.get(AuthConstants.HASHCODE_AXIS);
-        	
-        	if(!ts.connect(username, ip_address, port_number, axis)) {
+        	String username            = credentials.get(AuthConstants.HASHCODE_USERNAME);
+        	String ip_address          = credentials.get(AuthConstants.HASHCODE_IPADDRESS);
+        	Integer port_number        = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER));
+        	String ip_address_server   = credentials.get(AuthConstants.HASHCODE_IPADDRESS_SERVER);
+        	Integer port_number_server = Integer.valueOf(credentials.get(AuthConstants.HASHCODE_PORTNUMBER_SERVER));
+        	String axis                = credentials.get(AuthConstants.HASHCODE_AXIS);
+        	socket_TS_client.setup(ip_address_server, port_number_server);
+        	if(!socket_TS_client.ts_connect(username, ip_address, port_number, axis)) {
         		main.closeApplication();
         		Alert alert = new Alert(Alert.AlertType.ERROR);
         		alert.setTitle("Connection Fail");
@@ -79,7 +83,8 @@ public class AuthController implements Initializable {
         		Platform.exit();
 		        System.exit(0);
         	}else {
-        		if(!ts.init_admin_tuple()) {
+        		String env = socket_TS_client.ts_init_admin_tuple();
+        		if(env=="") {
             		Alert alert = new Alert(Alert.AlertType.WARNING);
             		alert.setTitle("Invalid port number");
             		alert.setResizable(false);
@@ -87,6 +92,11 @@ public class AuthController implements Initializable {
             		alert.showAndWait();
             		disableComponents(false);
             		return;
+        		}else {
+        			socket_TS_client.ts_env_name = env;
+                	socket_TS_client.ts_device_name = username;
+                	socket_TS_client.ts_ip_address = ip_address;
+                	socket_TS_client.ts_port_number = port_number;
         		}
         	}
         	
@@ -118,6 +128,18 @@ public class AuthController implements Initializable {
     			credentials.put(AuthConstants.HASHCODE_PORTNUMBER, AuthConstants.DEFAULT_PORTNUMBER);
     		}else {
     			credentials.put(AuthConstants.HASHCODE_PORTNUMBER, portTF.getText());
+    		}
+    		// ip address server
+    		if(ipTF2.getText().equals("")) {
+    			credentials.put(AuthConstants.HASHCODE_IPADDRESS_SERVER, AuthConstants.DEFAULT_IPADDRESS_SERVER);
+    		}else {
+    			credentials.put(AuthConstants.HASHCODE_IPADDRESS_SERVER, ipTF.getText());
+    		}
+    		// port number server
+    		if(portTF2.getText().equals("")) {
+    			credentials.put(AuthConstants.HASHCODE_PORTNUMBER_SERVER, AuthConstants.DEFAULT_PORTNUMBER_SERVER);
+    		}else {
+    			credentials.put(AuthConstants.HASHCODE_PORTNUMBER_SERVER, portTF.getText());
     		}
     		// axis
     		if(axisTF.getText().equals("")) {

@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 import application.Main_Device;
 import application.MainConstants;
 import application.socket.SocketFile;
-import application.ts.TupleSpace;
+import application.socket.SocketTS;
 import application.ui.constants.FXMLConstants;
 import application.ui.constants.ImageConstants;
 import javafx.application.Platform;
@@ -33,7 +33,7 @@ public class MainController implements Initializable {
 	private FXMLLoader configLoader;
 	
 	// COM Variables
-	private TupleSpace ts;
+	private SocketTS   socket_TS_client;
 	private SocketFile socket_file_server;
 	private SocketFile socket_file_client;
 	
@@ -49,9 +49,9 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		// Initialize Objects
-		ts = new TupleSpace();
 		socket_file_server = new SocketFile();
 		socket_file_client = new SocketFile();
+		socket_TS_client = new SocketTS();
 		
 		Scene configScene = null;
 		
@@ -74,11 +74,11 @@ public class MainController implements Initializable {
 		authentication();
 		
 		// Load common objects from parent
-		configController.loadFromParent(ts, socket_file_server, socket_file_client);
+		configController.loadFromParent(socket_TS_client, socket_file_server, socket_file_client);
 	}
 	
 	public void closeApplication() {
-		ts.disconnect();
+		socket_TS_client.disconnect(true);
 		socket_file_server.disconnect(true);
 		socket_file_client.disconnect(true);
 	}
@@ -88,7 +88,7 @@ public class MainController implements Initializable {
         Scene scene;
         Stage auth_stage;
         FXMLLoader loader = new FXMLLoader();
-        AuthController popupController = new AuthController(ts, this, configController);
+        AuthController popupController = new AuthController(socket_TS_client, this, configController);
         
         loader.setLocation(getClass().getResource(FXMLConstants.FXML_AUTH_CONTROLLER));
         loader.setController(popupController);

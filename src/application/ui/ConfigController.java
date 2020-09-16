@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import application.socket.SocketFile;
+import application.socket.SocketTS;
 import application.ts.Device;
 import application.ts.Environment;
-import application.ts.TupleSpace;
 import application.ui.constants.ConfigConstants;
 import application.ui.constants.ImageConstants;
 import application.ui.utils.ConfigComponentsArrayUtils;
@@ -40,17 +40,15 @@ public class ConfigController extends Thread implements Initializable  {
 	@FXML VBox vboxOnScroll;
 	
 	// COM Variables
-	private TupleSpace ts;
+	private SocketTS   socket_TS_client;
 	private SocketFile socket_file_server;
 	private SocketFile socket_file_client;
-	
-	// Controllers
 	
 	// Variables
 	private ConfigComponentsArrayUtils componentsArray_utils;
 	
-	public void loadFromParent(TupleSpace ts, SocketFile socket_file_server, SocketFile socket_file_client) {
-		this.ts = ts;
+	public void loadFromParent(SocketTS socket_TS_client, SocketFile socket_file_server, SocketFile socket_file_client) {
+		this.socket_TS_client = socket_TS_client;
 		this.socket_file_server = socket_file_server;
 		this.socket_file_client = socket_file_client;
 	}
@@ -71,7 +69,7 @@ public class ConfigController extends Thread implements Initializable  {
 		} catch (InterruptedException e) {
 			System.out.println("Error: ConfigController (thread)");
 		}
-		socket_file_server.setup(ts.get_ip_address(), ts.get_port_number());
+		socket_file_server.setup(socket_TS_client.ts_ip_address, socket_TS_client.ts_port_number);
 		socket_file_server.run_server();
 		while(true) {
 			try {
@@ -93,17 +91,18 @@ public class ConfigController extends Thread implements Initializable  {
 					}
 				});
 			}
-			
-			List<Environment> ts_envs = ts.get_environments_list();
-			List<Device> ts_devices = ts.get_devices_list();
-			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
-			
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					componentsArray_utils.updateComponentsList(ts.get_device_name(), ts.get_environment_name(), ts_envs, ts_devices, ts_hash);
-				}
-			});
+
+//          TODO: CREATE SOCKET ENTRYS AND UPDATE TUPLE SPACE TO SEND CURRENT DEVICE INFORMATION
+//			List<Environment> ts_envs = ts.get_environments_list();
+//			List<Device> ts_devices = ts.get_devices_list();
+//			HashMap<Device, Environment> ts_hash = ts.get_hash_devices_environments();
+//			
+//			Platform.runLater(new Runnable() {
+//				@Override
+//				public void run() {
+//					componentsArray_utils.updateComponentsList(socket_TS_client.ts_device_name, socket_TS_client.ts_env_name, ts_envs, ts_devices, ts_hash);
+//				}
+//			});
 		}
 	}
 	
@@ -125,9 +124,9 @@ public class ConfigController extends Thread implements Initializable  {
 				
 				String axis = td.getResult();
 				if(axis!=null) {
-					ts.set_axis(axis);
+					socket_TS_client.ts_set_axis(axis);
 					do {
-						if(ts.update_device()) {
+						if(socket_TS_client.ts_update_device()) {
 							break;
 						}
 					}while(true);
@@ -140,22 +139,24 @@ public class ConfigController extends Thread implements Initializable  {
 	        });
 		}else {
 			b_device.setOnAction((event)->{
-				Device dev = ts.get_device(device_name, env_name);
-				socket_file_client.setup(dev.ip_address, dev.port_number);
-				if(socket_file_client.connect()) {
-					FileChooser chooser = new FileChooser();
-					File file = chooser.showOpenDialog(new Stage());
-			        if (file != null) {
-			        	socket_file_client.send_file_call(file, ts.get_device_name());
-			        	socket_file_client.disconnect(false);
-			        }
-	    		}else {
-    				Alert alert = new Alert(Alert.AlertType.ERROR);
-    				alert.setTitle("Connection Information");
-    				alert.setResizable(false);
-    				alert.setHeaderText("Connection Unsuccessful!");
-    				alert.showAndWait();
-	    		}
+				Device dev = socket_TS_client.ts_get_device(device_name, env_name);
+				if(dev!=null) {
+					socket_file_client.setup(dev.ip_address, dev.port_number);
+					if(socket_file_client.connect()) {
+						FileChooser chooser = new FileChooser();
+						File file = chooser.showOpenDialog(new Stage());
+				        if (file != null) {
+				        	socket_file_client.send_file_call(file, socket_TS_client.ts_device_name);
+				        	socket_file_client.disconnect(false);
+				        }
+		    		}else {
+	    				Alert alert = new Alert(Alert.AlertType.ERROR);
+	    				alert.setTitle("Connection Information");
+	    				alert.setResizable(false);
+	    				alert.setHeaderText("Connection Unsuccessful!");
+	    				alert.showAndWait();
+		    		}
+				}
 	        });
 		}
 	}

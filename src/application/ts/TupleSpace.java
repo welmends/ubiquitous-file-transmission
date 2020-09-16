@@ -76,6 +76,22 @@ public class TupleSpace extends Thread {
 	}
 	
 	// Connection
+	public Boolean init_tuplespace_server() {
+		try {
+	    	TupleAdmin template_admin = new TupleAdmin();
+	    	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+	    	if(tuple_admin==null) {
+	    		template_admin.environments = new ArrayList<Environment>();
+	    		template_admin.devices = new ArrayList<Device>();
+	    		this.space.write(template_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
+	    		return true;
+	    	}
+		}catch (Exception e) {
+			System.out.println("Error: TupleSpace (init_tuplespace_server)");
+		}
+    	return false;
+	}
+	
     public Boolean connect(String device_name, String ip_address, Integer port_number, String axis){
     	this.device_name = device_name;
     	this.ip_address = ip_address;
@@ -151,16 +167,7 @@ public class TupleSpace extends Thread {
         	String env_name;
         	TupleAdmin template_admin = new TupleAdmin();
         	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
-        	if(tuple_admin==null) {
-        		template_admin.environments = new ArrayList<Environment>();
-        		template_admin.devices = new ArrayList<Device>();
-        		template_admin.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
-        		this.space.write(template_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-        		env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name();
-        		add_environment(env_name);
-        		select_environment(env_name);
-        		set_environment_name(env_name);
-        	}else {
+        	if(tuple_admin!=null) {
         		for(int i=0; i<tuple_admin.devices.size(); i++) {
         			if(tuple_admin.devices.get(i).port_number.equals(get_port_number())) {
         				return false;
