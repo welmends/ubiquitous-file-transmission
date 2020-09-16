@@ -20,18 +20,14 @@ public class TupleAdmin implements Entry {
     	return -1;
     }
     
-    public Integer deviceIndex(String device_name, String environment_name) {
-    	int degree = 1;
-    	if(environment_name.indexOf("_")!=environment_name.lastIndexOf("_")) {
-    		degree = Integer.valueOf(environment_name.substring(environment_name.lastIndexOf("_")+1));
-    	}
+    public Integer deviceIndex(Device env_device) {
     	for(int i=0; i<devices.size(); i++) {
-    		if(devices.get(i).name.equals(device_name)) {
-    			if(degree==1) {
-    				return i;
-    			}else {
-    				degree-=1;
-    			}
+    		if(devices.get(i).name.equals(env_device.name)
+    				&& devices.get(i).x_axis.equals(env_device.x_axis)
+    				&& devices.get(i).y_axis.equals(env_device.y_axis)
+    				&& devices.get(i).ip_address.equals(env_device.ip_address) 
+    				&& devices.get(i).port_number.equals(env_device.port_number)) {
+    			return i;
     		}
     	}
     	return -1;
