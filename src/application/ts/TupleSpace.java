@@ -1,6 +1,7 @@
 package application.ts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -65,6 +66,7 @@ public class TupleSpace extends Thread {
 	        	this.space_admin.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
 			} catch (Exception e) {
 				System.out.println("Error: TupleSpace (thread)");
+				System.out.println(e);
 			}
 		}
 	}
@@ -155,7 +157,8 @@ public class TupleSpace extends Thread {
         		}
         		int device_amount = tuple_admin.deviceAmount(get_device_name());
         		if(device_amount>0) {
-        			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+"_"+String.valueOf(device_amount+1);
+        			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+define_duplicity_environment_name();
+        			//env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+"_"+String.valueOf(device_amount+1);
         		}else {
         			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name();
         		}
@@ -415,6 +418,55 @@ public class TupleSpace extends Thread {
 			return false;
 		}
     	return true;
+    }
+    
+    public String define_duplicity_environment_name() {
+    	String duplicity = "";
+    	List<String> envs_names = new ArrayList<String>();
+    	List<Integer> envs_names_degrees = new ArrayList<Integer>();
+        try {
+        	Boolean in;
+        	int device_index;
+        	TupleAdmin template_admin = new TupleAdmin();
+        	TupleAdmin tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+        	TupleEnvironment template_env, tuple_env;
+        	if(tuple_admin!=null) {
+        		for (int i=0; i<tuple_admin.environments.size(); i++) {
+                	template_env = new TupleEnvironment();
+                	template_env.env_name = tuple_admin.environments.get(i).name;
+                	tuple_env = (TupleEnvironment) this.space.read(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
+                	device_index = tuple_env.deviceIndex(get_device_name());
+        			if(device_index!=-1) {
+        				envs_names.add(tuple_env.env_name);
+        				System.out.println(tuple_env.env_name);
+        			}
+				}
+        	}
+        	for(int i=0; i<envs_names.size(); i++) {
+            	if(envs_names.get(i).indexOf("_")!=envs_names.get(i).lastIndexOf("_")) {
+            		envs_names_degrees.add(Integer.valueOf(envs_names.get(i).substring(envs_names.get(i).lastIndexOf("_")+1)));
+            	}else {
+            		envs_names_degrees.add(1);
+            	}
+        	}
+        	Collections.sort(envs_names_degrees);
+        	in = false;
+        	for(int i=0; i<envs_names_degrees.size(); i++) {
+        		if(!envs_names_degrees.get(i).equals(i+1)) {
+        			in = true;
+        			if(i!=0) {
+        				duplicity = "_"+String.valueOf(i+1);
+        			}
+        			break;
+        		}
+        	}
+        	if(in==false) {
+        		duplicity = "_"+String.valueOf(envs_names_degrees.size()+1);
+        	}
+		} catch (Exception e) {
+			System.out.println("Error: TupleSpace (define_duplicity_environment_name)");
+		}
+        return duplicity;
     }
     
     // Getters
