@@ -109,8 +109,8 @@ public class ConfigComponentsArrayUtils {
 		tp.setContent(new VBox());
 		if(!tp.getText().equals(ts_env_name)) {
 			tp.setDisable(true);    
-			tp.setExpanded(false); //***>>> Set true to see environments content
-			//return;              //***>>> Uncomment to not show other environments 
+			tp.setExpanded(true);  //***>>> Set false to not show other environments content
+			//return;              //***>>> Uncomment to not show other environments T_panes 
 		}
 		
 		envs_components.add(tp);
