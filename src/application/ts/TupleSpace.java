@@ -44,26 +44,30 @@ public class TupleSpace extends Thread {
 				Thread.sleep(TupleSpaceConstants.THREAD_SLEEP_TIME_MILLIS);
 				// Update tuple_admin
 				to_remove_envs.clear();
+				int env_index;
 	        	TupleAdmin template_admin = new TupleAdmin();
 	        	TupleAdmin tuple_admin = (TupleAdmin) this.space_admin.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
+	        	TupleEnvironment template_env, tuple_env;
 	        	if(tuple_admin!=null) {
-	        		TupleEnvironment template_env = new TupleEnvironment();
+	        		//Fill to_remove_envs array
+	        		template_env = new TupleEnvironment();
 	        		for (int i=0; i<tuple_admin.environments.size(); i++) {
 	        			template_env.env_name = tuple_admin.environments.get(i).name;
-						TupleEnvironment tuple_env = (TupleEnvironment) this.space_admin.read(template_env, null, TupleSpaceConstants.TIMER_NO_WAIT);
+						tuple_env = (TupleEnvironment) this.space_admin.read(template_env, null, TupleSpaceConstants.TIMER_NO_WAIT);
 						if(tuple_env==null) {
 							to_remove_envs.add(tuple_admin.environments.get(i).name);
 						}
 					}
+		        	//Use to_remove_envs array
+	        		for (int i=0; i<to_remove_envs.size(); i++) {
+	        			env_index = tuple_admin.environmentIndex(to_remove_envs.get(i));
+	        			if(env_index!=-1) {
+	        				tuple_admin.environments.remove(env_index);
+	        			}
+					}
+	        		//Write TupleAdmin
+		        	this.space_admin.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
 	        	}
-	        	int envIndex;
-        		for (int i=0; i<to_remove_envs.size(); i++) {
-        			envIndex = tuple_admin.environmentIndex(to_remove_envs.get(i));
-        			if(envIndex!=-1) {
-        				tuple_admin.environments.remove(envIndex);
-        			}
-				}
-	        	this.space_admin.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
 			} catch (Exception e) {
 				System.out.println("Error: TupleSpace (thread)");
 				System.out.println(e);
@@ -438,7 +442,6 @@ public class TupleSpace extends Thread {
                 	device_index = tuple_env.deviceIndex(get_device_name());
         			if(device_index!=-1) {
         				envs_names.add(tuple_env.env_name);
-        				System.out.println(tuple_env.env_name);
         			}
 				}
         	}
