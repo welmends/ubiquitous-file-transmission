@@ -81,9 +81,9 @@ public class AuthController implements Initializable {
         	}else {
         		if(!ts.init_admin_tuple()) {
             		Alert alert = new Alert(Alert.AlertType.WARNING);
-            		alert.setTitle("Invalid username");
+            		alert.setTitle("Invalid port number");
             		alert.setResizable(false);
-            		alert.setHeaderText("The username is invalid. Try another one.");
+            		alert.setHeaderText("The port number is invalid. Try another one.");
             		alert.showAndWait();
             		disableComponents(false);
             		return;

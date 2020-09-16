@@ -145,9 +145,16 @@ public class TupleSpace extends Thread {
         		select_environment(env_name);
         		set_environment_name(env_name);
         	}else {
+        		System.out.println("my port: "+get_port_number());
+        		for(int i=0; i<tuple_admin.devices.size(); i++) {
+        			System.out.println(tuple_admin.devices.get(i).port_number);
+        			if(tuple_admin.devices.get(i).port_number.equals(get_port_number())) {
+        				return false;
+        			}
+        		}
         		int device_amount = tuple_admin.deviceAmount(get_device_name());
         		if(device_amount>0) {
-        			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+"_"+String.valueOf(device_amount);
+        			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+"_"+String.valueOf(device_amount+1);
         		}else {
         			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name();
         		}
