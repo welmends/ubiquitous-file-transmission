@@ -114,8 +114,14 @@ public class TupleSpace extends Thread {
         	template_env.env_name = get_environment_name();
         	this.space.take(template_env, null, TupleSpaceConstants.TIMER_TAKE_ENV);
         	//Update tuples_environments
+        	String env_prefix;
+        	if(get_environment_name().indexOf("_")!=get_environment_name().lastIndexOf("_")) {
+        		env_prefix = get_environment_name().substring(0,get_environment_name().lastIndexOf("_"));
+        	}else {
+        		env_prefix = get_environment_name();
+        	}
         	for(int i=0; i<tuple_admin.environments.size(); i++) {
-        		if(get_environment_name().contains(tuple_admin.environments.get(i).name) || tuple_admin.environments.get(i).name.contains(get_environment_name())) {
+        		if(env_prefix.contains(tuple_admin.environments.get(i).name) || tuple_admin.environments.get(i).name.contains(env_prefix)) {
         			continue;
         		}
     			template_env = new TupleEnvironment();
@@ -162,14 +168,12 @@ public class TupleSpace extends Thread {
         		int device_amount = tuple_admin.deviceAmount(get_device_name());
         		if(device_amount>0) {
         			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+define_duplicity_environment_name();
-        			//env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name()+"_"+String.valueOf(device_amount+1);
         		}else {
         			env_name = TupleSpaceConstants.PREFIX_ENV+get_device_name();
         		}
     			tuple_admin.devices.add(new Device(get_device_name(), get_x_axis(), get_y_axis(), get_ip_address(), get_port_number()));
     			this.space.take(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
     			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
-    			tuple_admin = (TupleAdmin) this.space.read(template_admin, null, TupleSpaceConstants.TIMER_TAKE_ADMIN);
         		add_environment(env_name);
         		select_environment(env_name);
         		set_environment_name(env_name);
