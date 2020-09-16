@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import application.Main;
+import application.Main_Device;
 import application.MainConstants;
 import application.socket.SocketFile;
 import application.ts.TupleSpace;
@@ -41,8 +41,8 @@ public class MainController implements Initializable {
 	private ConfigController configController;
 	
 	// Main Object
-	private Main main;
-    public void setMainApp(Main main) {
+	private Main_Device main;
+    public void setMainApp(Main_Device main) {
         this.main = main;
     }
     

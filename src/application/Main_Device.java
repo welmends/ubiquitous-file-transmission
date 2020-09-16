@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.Scene;
 
-public class Main extends Application {
+public class Main_Device extends Application {
 	private Stage primaryStage;
 	
 	public static void main(String[] args) {
