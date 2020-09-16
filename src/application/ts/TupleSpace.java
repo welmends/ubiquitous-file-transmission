@@ -102,7 +102,7 @@ public class TupleSpace extends Thread {
         	if(tuple_admin!=null) {
         		env_index = tuple_admin.environmentIndex(get_environment_name());
         		device_index = tuple_admin.deviceIndex(get_device_name(), get_environment_name());
-        		if(env_index!=1 && device_index!=-1) {
+        		if(env_index!=-1 && device_index!=-1) {
         			tuple_admin.environments.remove(env_index);
         			tuple_admin.devices.remove(device_index);
         			this.space.write(tuple_admin, null, TupleSpaceConstants.TIMER_KEEP_UNDEFINED);
